@@ -1,0 +1,30 @@
+<html>
+<head>
+<title>HEADER</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" CONTENT="Paolo Caroni">
+<meta name="license" CONTENT="GNU FDL 1.3 or any later versions">
+	<style>
+		<!-- 
+		body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Liberation Sans"; font-size:16 }
+		 -->
+	</style>
+</head>
+<body bgcolor=#ffffff>
+<h1>PIA common file header</h1>
+<p>
+All the PIA file have similar PIA header on the first 60 bytes of the file.<br>
+this 60 bytes are uncompressed, and are divided in:<br>
+48 bytes of text that define the version of the PIA file (2.0), the specific sub-class type of PIA file (CTB or STB or PC3 or PMP) and the version of the specification of the sub-class (VER1)<br>
+<cite>PIAFILEVERSION_2.0,CTBVER1,compress<br>pmzlibcodecl</cite><br>
+4 bytes with Adler-32 checksum, as defined in <a href=ftp://ftp.uu.net/graphics/png/documents/zlib/zdoc-index.html title="ZLIB Compressed Data Format Specification">rfc1950</a><br>
+4 bytes with a splitted unsigned int32, that indicate the value of Inflated Size<br>
+4 bytes with a splitted unsigned int32, that indicate the value of Deflated Size<br>
+<br>
+
+
+
+
+
+</body>
+</html>
