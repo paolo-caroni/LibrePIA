@@ -164,9 +164,40 @@ unsigned int decompressed_size=0, compressed_size=0;
  }
 
  /* funtion for read CTB uncompressed text form file*/
- int read_ctb()
+ int read_ctb(char *infilename)
  {
      fprintf(stderr, "Work in progress...\n");
+
+    /* declare ctb string and matrix*/
+    char description[255],aci_table_available[26],scale_factor[18],apply_factor[20],custom_lineweight_display_units[35],aci_table[258][20];
+    /* declare k for 255 0r more varialbles*/
+    int k=0;
+
+    /* open decompressed PIA file, this is very stupid, there is the data string,
+    but I don't know how analyze it... needs more C abilities*/
+    FILE *infile = fopen(infilename, "rb");
+
+    /* READ ctb*/
+    fgets(description,sizeof(description),infile);
+    fgets(aci_table_available,sizeof(aci_table_available),infile);
+    fgets(scale_factor,sizeof(scale_factor),infile);
+    fgets(apply_factor,sizeof(apply_factor),infile);
+    fgets(custom_lineweight_display_units,sizeof(custom_lineweight_display_units),infile);
+
+    printf("%s\n",description);
+    printf("%s\n",aci_table_available);
+    printf("%s\n",scale_factor);
+    printf("%s\n",apply_factor);
+    printf("%s\n",custom_lineweight_display_units);
+
+    /* read aci_table as matrix*/
+    for(k=0;k<258-1;k++)
+    {
+    fgets(aci_table[k],20,infile);
+    printf("%s",aci_table[k]);
+    printf("%d",k);
+    }
+    /* too difficult to me at the moment*/
  }
 
  /* proof of concept for decompress PIA file in a text form,
@@ -178,7 +209,7 @@ unsigned int decompressed_size=0, compressed_size=0;
     /* Verify subclass type*/
     if (header[19]=='C' && header[20]=='T' && header[21]=='B')
     {
-    read_ctb();
+    read_ctb(argv[2]);
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
