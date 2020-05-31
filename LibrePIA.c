@@ -25,10 +25,10 @@
 /* Declare header and info*/
 unsigned char header[37],header2[11],checksum[12];
 unsigned int decompressed_size=0, compressed_size=0;
-int PIA_ver=0, subclass_ver=0;  
+/*int PIA_ver=0, subclass_ver=0; unused*/
 
 
-/* obtain information of file size*/
+/* obtain information of version,file subclass type and sizes*/
  unsigned long read_header(char *infilename)
  {
     /* open compressed PIA file but without zlib*/
@@ -53,7 +53,7 @@ int PIA_ver=0, subclass_ver=0;
     /* PIA version*/
     if (header[15]=='2' && header[16]=='.' && header[17]=='0')
     {
-    PIA_ver=2;
+    /*PIA_ver=2; unused the actual aim is 2.0 only*/
     }
     /* PIA version isn't 2.0*/
     else
@@ -61,11 +61,11 @@ int PIA_ver=0, subclass_ver=0;
     fprintf(stderr, "WARNING:unsupported PIA file version\n\n");
     }
 
-    /* verify sub-class version*/
-    /* sub-class version*/
+    /* verify subclass version*/
+    /* subclass version*/
     if (header[25]=='1')
     {
-    subclass_ver=1;
+    /*subclass_ver=1; unused the actual aim is 1 only*/
     }
     /* subclass_ver isn't 1*/
     else
@@ -111,6 +111,7 @@ int PIA_ver=0, subclass_ver=0;
     /* declare data, data size is equal to decompressed size without header(48byte), Adler 32 checksum(4byte), 
     decompressed size (4byte) and compressed size(4byte), in total (60byte)*/
     char data[decompressed_size-48-4-4-4];
+    /* number of byte readed*/
     int num_read = 0;
 
     /* first 48 bytes = header (not compressed, composed by "PIAFILEVERSION_2.0,???VER1,compress/r/npmzlibcodec)
@@ -162,12 +163,44 @@ int PIA_ver=0, subclass_ver=0;
     fclose(outfile);
  }
 
+ /* funtion for read CTB uncompressed text form file*/
+ int read_ctb()
+ {
+     fprintf(stderr, "Work in progress...\n");
+ }
+
  /* proof of concept for decompress PIA file in a text form,
  can be used for all PIA file (ctb, stb, pc3, pmp)*/
  int main(int argc, char **argv)
  {
     read_header(argv[1]);
     decompress_data(argv[1],argv[2]);
+    /* Verify subclass type*/
+    if (header[19]=='C' && header[20]=='T' && header[21]=='B')
+    {
+    read_ctb();
+    }
+
+    else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
+    {
+    fprintf(stderr, "Sorry, the .stb subclass type isn't yet supported\n\n");
+    }
+
+    else if (header[19]=='P' && header[20]=='C' && header[21]=='3')
+    {
+    fprintf(stderr, "Sorry, the .pc3 subclass type isn't yet supported.\nMaybe .pc3 would be never supported since is correlated to .hdi file.\n\n");
+    }
+
+    else if (header[19]=='P' && header[20]=='M' && header[21]=='P')
+    {
+    fprintf(stderr, "Sorry, the .pmp subclass type isn't yet supported.\nThe support of .pmp. isn't a priority.\n\n");
+    }
+
+    /* if in the header there is something wrong*/
+    else
+    {
+    fprintf(stderr, "WARNING:This isn't a known subclass type\n\n");
+    }
  }
 
 
