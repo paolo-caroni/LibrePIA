@@ -74,19 +74,19 @@ int k=0,PIA_uncompressed_line_number=0;
     fprintf(stderr, "WARNING:unsupported sub-class version\n\n");
     }
 
-    /* readed_Adler32 set to the combination of the number 48-49-50-51 bytes*/
+    /* readed_Adler32 set to the combination of the number 49-50-51-52 bytes*/
     readed_Adler32 = (readed_Adler32 << 8) + checksum[3];
     readed_Adler32 = (readed_Adler32 << 8) + checksum[2];
     readed_Adler32 = (readed_Adler32 << 8) + checksum[1];
     readed_Adler32 = (readed_Adler32 << 8) + checksum[0];
 
-    /* readed_decompressed_size set to the combination of the number 52-53-54-55 bytes*/
+    /* readed_decompressed_size set to the combination of the number 53-54-55-56 bytes*/
     readed_decompressed_size = (readed_decompressed_size << 8) + checksum[7];
     readed_decompressed_size = (readed_decompressed_size << 8) + checksum[6];
     readed_decompressed_size = (readed_decompressed_size << 8) + checksum[5];
     readed_decompressed_size = (readed_decompressed_size << 8) + checksum[4];
 
-    /* readed_compressed_size set to the combination of the number 56-57-58-59 bytes*/
+    /* readed_compressed_size set to the combination of the number 57-58-59-60 bytes*/
     readed_compressed_size = (readed_compressed_size << 8) + checksum[11];
     readed_compressed_size = (readed_compressed_size << 8) + checksum[10];
     readed_compressed_size = (readed_compressed_size << 8) + checksum[9];
