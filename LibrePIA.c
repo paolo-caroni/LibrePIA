@@ -24,7 +24,8 @@
 
 /* Declare header and info*/
 unsigned char header[37],header2[11],checksum[12];
-unsigned int decompressed_size=0, compressed_size=0;
+unsigned int readed_decompressed_size=0, readed_compressed_size=0, readed_Adler32=0;
+int k=0,PIA_uncompressed_line_number=0;
 /*int PIA_ver=0, subclass_ver=0; unused*/
 
 
@@ -73,22 +74,28 @@ unsigned int decompressed_size=0, compressed_size=0;
     fprintf(stderr, "WARNING:unsupported sub-class version\n\n");
     }
 
-    /* decompressed_size set to the combination of the number 52-53-54-55 bytes*/
-    decompressed_size = (decompressed_size << 8) + checksum[7];
-    decompressed_size = (decompressed_size << 8) + checksum[6];
-    decompressed_size = (decompressed_size << 8) + checksum[5];
-    decompressed_size = (decompressed_size << 8) + checksum[4];
+    /* readed_Adler32 set to the combination of the number 48-49-50-51 bytes*/
+    readed_Adler32 = (readed_Adler32 << 8) + checksum[3];
+    readed_Adler32 = (readed_Adler32 << 8) + checksum[2];
+    readed_Adler32 = (readed_Adler32 << 8) + checksum[1];
+    readed_Adler32 = (readed_Adler32 << 8) + checksum[0];
 
-    /* compressed_size set to the combination of the number 56-57-58-59 bytes*/
-    compressed_size = (compressed_size << 8) + checksum[11];
-    compressed_size = (compressed_size << 8) + checksum[10];
-    compressed_size = (compressed_size << 8) + checksum[9];
-    compressed_size = (compressed_size << 8) + checksum[8];
+    /* readed_decompressed_size set to the combination of the number 52-53-54-55 bytes*/
+    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[7];
+    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[6];
+    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[5];
+    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[4];
+
+    /* readed_compressed_size set to the combination of the number 56-57-58-59 bytes*/
+    readed_compressed_size = (readed_compressed_size << 8) + checksum[11];
+    readed_compressed_size = (readed_compressed_size << 8) + checksum[10];
+    readed_compressed_size = (readed_compressed_size << 8) + checksum[9];
+    readed_compressed_size = (readed_compressed_size << 8) + checksum[8];
 
     /* debug function*/
     #if DEBUG
-    printf("expected compressed size: %d\n", compressed_size);
-    printf("expected decompressed size: %d\n", decompressed_size-48-4-4-4);
+    printf("expected compressed size: %d\n", readed_compressed_size);
+    printf("expected decompressed size: %d\n", readed_decompressed_size-48-4-4-4);
     #endif
 
     /* close input and output file*/
@@ -107,10 +114,10 @@ unsigned int decompressed_size=0, compressed_size=0;
     if (!infile || !outfile) return -1;
 
     /* declare buffer, buffer size is the compressed size*/
-    char buffer[compressed_size];
+    char buffer[readed_compressed_size];
     /* declare data, data size is equal to decompressed size without header(48byte), Adler 32 checksum(4byte), 
     decompressed size (4byte) and compressed size(4byte), in total (60byte)*/
-    char data[decompressed_size-48-4-4-4];
+    char data[readed_decompressed_size-48-4-4-4];
     /* number of byte readed*/
     int num_read = 0;
 
@@ -146,7 +153,7 @@ unsigned int decompressed_size=0, compressed_size=0;
        inflateEnd(&infstream);
 
        /* write uncompressed data*/
-       fwrite(data, 1, decompressed_size-60, outfile);
+       fwrite(data, 1, readed_decompressed_size-60, outfile);
 
        /* Obtain information of output file size*/
        unsigned long output_file_size = ftell(outfile);
@@ -156,6 +163,16 @@ unsigned int decompressed_size=0, compressed_size=0;
        printf("readed %d compressed bytes\n", num_read);
        printf("writed %d decompressed bytes\n", output_file_size);
        #endif
+
+       /* count number of line in uncompressed stream*/
+       for(k=0;data[k];k++)
+       {
+       if(data[k]=='\n'){PIA_uncompressed_line_number++;}
+       }
+       #if DEBUG
+       printf("uncompressed data splitted in %d lines\n", PIA_uncompressed_line_number);
+       #endif
+
     }
 
     /* close input and output file*/
@@ -170,8 +187,8 @@ unsigned int decompressed_size=0, compressed_size=0;
 
     /* declare ctb string and matrix*/
     char description[255],aci_table_available[26],scale_factor[18],apply_factor[20],custom_lineweight_display_units[35],aci_table[258][20];
-    /* declare k for 255 0r more varialbles*/
-    int k=0;
+    /* remove old value from k*/
+    k=0;
 
     /* open decompressed PIA file, this is very stupid, there is the data string,
     but I don't know how analyze it... needs more C abilities*/
@@ -184,18 +201,21 @@ unsigned int decompressed_size=0, compressed_size=0;
     fgets(apply_factor,sizeof(apply_factor),infile);
     fgets(custom_lineweight_display_units,sizeof(custom_lineweight_display_units),infile);
 
+    #if DEBUG
     printf("%s\n",description);
     printf("%s\n",aci_table_available);
     printf("%s\n",scale_factor);
     printf("%s\n",apply_factor);
     printf("%s\n",custom_lineweight_display_units);
+    #endif
 
     /* read aci_table as matrix*/
     for(k=0;k<258-1;k++)
     {
     fgets(aci_table[k],20,infile);
+    #if DEBUG
     printf("%s",aci_table[k]);
-    printf("%d",k);
+    #endif
     }
     /* too difficult to me at the moment*/
  }
