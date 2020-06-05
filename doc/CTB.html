@@ -66,9 +66,9 @@ Default value is <cite><br>
  253="Color_254<br>
  254="Color_255<br>
 }</cite><br><br>
-the format is <cite>/nNUMBER="Color_NUMBER+1</cite><br>
+the format is <cite> NUMBER="Color_NUMBER+1</cite><br>
 the <cite>NUMBER</cite> can't change;<br>
-the <cite>Color</cite> can be named in other language (like <cite>Colore</cite> in Italian);<br>
+the <cite>Color</cite> can be named in other language (like <cite>Colore</cite> in Italian).<br>
 <br>
 <h3>plot_style{</h3>
 <p>
@@ -78,7 +78,7 @@ is writed in the form:<br><br>
   name="Color_NUMBER+1<br>
   localized_name="Color_NUMBER+1<br>
   description="Description_NUMBER+1<br>
-  color=-1<br>
+  color=-1023410176<br>
   mode_color=-1023410176<br>
   color_policy=1<br>
   physical_pen_number=1<br>
@@ -110,8 +110,8 @@ in theory is in local language,but is always equal to name=<br>
 <h4>description=</h4>
 <p>
 Custom description of color plot style.<br><br>
-Default value is <cite>"Description_NUMBER+1</cite><br><br>
-the default value <cite>Description</cite> can be named in other language (like <cite>Descrizione</cite> in Italian);<br>
+Default value is <cite>"</cite> or <cite>"Description_NUMBER+1</cite><br><br>
+the default value <cite>Description</cite> can be named in other language (like <cite>Descrizione</cite> in Italian).<br>
 <br>
 <h4>color=</h4>
 <p>
@@ -144,6 +144,7 @@ Here is where mode_color helps, if color is an impossible color number, the colo
 The scope is not very clear to me.<br><br>
 Default value is not clear<br><br>
 Optional,not present in all CTB, so for writing a basic ctb maybe can be ignored.<br>
+If present the CTB uncompressed data is about 4883 line, if not 4628 (4883-255).<br>
 Need much more investigations.<br>
 If the color value is an <a href="ACI.html" title="Autocad Colour Index">ACI</a> mode_color==color.<br>
 If it's not the mode_color value differ to the color value.<br><br>
