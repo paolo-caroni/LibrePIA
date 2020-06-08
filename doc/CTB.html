@@ -22,6 +22,7 @@ CTB files have been replaced by <a href="STB.html" title="Named Plot Style Table
 <p>
 Custom description of plot style file.<br><br>
 Default value is <cite>"</cite><br><br>
+Can't contain any <cite>\n</cite> and have a maximum characters of 1025.<br>
 <br>
 <h3>aci_table_available=</h3>
 <p>
@@ -95,6 +96,7 @@ is writed in the form:<br><br>
 <br>
 <h4>name=</h4>
 <p>
+<!-- need more investigations for different languages-->
 Name of color.<br><br>
 Default value is <cite>"Color_NUMBER+1</cite><br><br>
 the <cite>Color</cite> can be named in other language (like <cite>Colore</cite> in Italian);<br>
@@ -102,16 +104,19 @@ in theory is always in english, but in italian version is in italian<br>
 <br>
 <h4>localized_name=</h4>
 <p>
+<!-- need more investigations for different languages-->
 Name of color in localized language.<br><br>
 Default value is <cite>"Color_NUMBER+1</cite><br><br>
 the <cite>Color</cite> can be named in other language (like <cite>Colore</cite> in Italian);<br>
-in theory is in local language,but is always equal to name=<br>
+in theory is in local language, but is always equal to name=<br>
 <br>
 <h4>description=</h4>
 <p>
 Custom description of color plot style.<br><br>
 Default value is <cite>"</cite> or <cite>"Description_NUMBER+1</cite><br><br>
 the default value <cite>Description</cite> can be named in other language (like <cite>Descrizione</cite> in Italian).<br>
+Can't contain any <cite>\n</cite> and have a maximum characters of 4869.<br>
+This seems to be the longest possible line in the ctb file (15+4869+1=4885 byte of line)<br>
 <br>
 <h4>color=</h4>
 <p>
@@ -186,7 +191,7 @@ Default value is <cite>100</cite><br><br>
 Valid range is from <cite>0</cite> to <cite>100</cite><br><br>
 Full colour intensity is <cite>100</cite><br>
 No colour intensity (not printed at all) is <cite>0</cite><br>
-In order for screening to work, the dithering option seems to be active.<br>
+In order for screening to work, the dithering option seems to be automatically enabled.<br>
 <br>
 <h4>linepattern_size=</h4>
 <p>
