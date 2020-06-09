@@ -25,7 +25,7 @@
 #include "ctb.h"
 
 /* declare header and info common to all PIA files*/
-unsigned char header[37],header2[11],checksum[12];
+unsigned char header[37],header2[11],checksum[12],line_buffer[4900];
 unsigned int readed_decompressed_size=0, readed_compressed_size=0, readed_Adler32=0;
 int k=0,PIA_uncompressed_line_number=0;
 /*int PIA_ver=0, subclass_ver=0; unused*/
@@ -197,7 +197,7 @@ int k=0,PIA_uncompressed_line_number=0;
     /* Parse ctb file*/
     /* first line, description, can contain space*/
     fgets(line_buffer,sizeof(line_buffer),infile);
-    sscanf(line_buffer,"description=%[^\n]",&description);
+    sscanf(line_buffer,"description=%[^\n]",&file_description);
     /* second line, aci_table_available, always TRUE*/
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer,"aci_table_available=%c",&aci_table_available);
@@ -213,7 +213,7 @@ int k=0,PIA_uncompressed_line_number=0;
 
 
     #if DEBUG
-    printf("description=%s\n",description);
+    printf("description=%s\n",file_description);
     if (aci_table_available==84)
     {
     printf("aci_table_available=TRUE\n");
@@ -317,9 +317,9 @@ int k=0,PIA_uncompressed_line_number=0;
        #endif
        /* color value description*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       sscanf(line_buffer,"  description=%1025s",&color_description[k]);
+       sscanf(line_buffer,"  description=%[^\n]",&description[k]);
        #if DEBUG
-       printf("description=%s\n",color_description[k]);
+       printf("description=%s\n",description[k]);
        #endif
        /* color value color*/
        fgets(line_buffer,sizeof(line_buffer),infile);
@@ -416,12 +416,41 @@ int k=0,PIA_uncompressed_line_number=0;
        #endif
        /* color value end of color }*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-
-
-    
+       if (line_buffer[1]=='}')
+       {
        }
+       else
+       {
+         fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+       }
+    }
 
+    /* read the end of plot_style*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if (line_buffer[0]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+    }
 
+    /* read custom_lineweight_table*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if (line_buffer[0]=='c' && line_buffer[1]=='u' && line_buffer[2]=='s' && line_buffer[3]=='t' && line_buffer[4]=='o' && line_buffer[5]=='m')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "ERROR!\nexpected: \"custom_lineweight_table{\"\nobtained: \"%s\"", line_buffer);
+    }
+    /* read value from custom_lineweight_table*/
+    k=0;
+    for(k=0;k<27;k++)
+    {
+    fgets(line_buffer,sizeof(line_buffer),infile);
+//    sscanf(line_buffer," %d=%f",number,&custom_lineweight_table[k]);
+    }
  }
 
  /* proof of concept for decompress PIA file in a text form,

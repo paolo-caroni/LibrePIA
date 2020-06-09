@@ -18,7 +18,7 @@
  */
 
 /* declare ctb int, float, string, matrix, etc*/
-char line_buffer[1039],description[1027],/*aci_table_available[6],apply_factor[5],*/aci_table[256][20];
+char file_description[1027],/*aci_table_available[6],apply_factor[5],*/aci_table[256][20];
 int aci_table_available,apply_factor,custom_lineweight_display_units,min_color=0,max_color=254;
 float scale_factor;
 /* boolean, define TRUE and FALSE
@@ -29,7 +29,7 @@ const int FALSE = 0;
 int color_number[255];
 char name[255][12];
 char localized_name[255][12];
-char color_description[255][1025];
+char description[255][4869];
 int color[255];
 int mode_color[255];
 int color_policy[255];
