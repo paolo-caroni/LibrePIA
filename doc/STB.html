@@ -1,0 +1,332 @@
+<html>
+<head>
+<title>STB Named Plot Style Table</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="author" CONTENT="Paolo Caroni">
+<meta name="license" CONTENT="GNU FDL 1.3 or any later versions">
+	<style>
+		<!-- 
+		body,div,table,thead,tbody,tfoot,tr,th,td,p { font-family:"Liberation Sans"; font-size:16 }
+		 -->
+	</style>
+</head>
+<body bgcolor=#ffffff>
+<h1>STB Named Plot Style Table</h1>
+<p>
+STB is the new Plot Style Table that would replace the <a href="CTB.html" title="Color-dependent Plot Style Table">CTB</a> file, though many companies continue to use CTB files due to their compatibility and familiarity.<br>
+If the plot style table is attached to a Paperspace or the Modelspace, a change of a plot style affects any object that uses that plot style.<br>
+STB is derived from <a href="CTB.html" title="Color-dependent Plot Style Table">CTB</a> and is very similar to it, simply without the aci_table and a number of plot style variable (maybe 1 to 255).<br>
+<br>
+<h3>description=</h3>
+<p>
+Custom description of plot style file.<br><br>
+Default value is <cite>"</cite><br><br>
+Can't contain any <cite>\n</cite> and have a maximum characters of 1025.<br>
+<br>
+<h3>aci_table_available=</h3>
+<p>
+Descript if the <a href="ACI.html" title="Autocad Colour Index">ACI</a> colour table is available<br><br>
+Default value is <cite>FALSE</cite><br><br>
+never seen other value, since if is available the file is a <a href="CTB.html" title="Color-dependent Plot Style Table">CTB</a>.<br>
+<br>
+<h3>scale_factor=</h3>
+<p>
+Specifies the factor by which to scale non-ISO linetypes and fill patterns.<br><br>
+Default value is <cite>1.0</cite><br><br>
+<br>
+<h3>apply_factor=</h3>
+<p>
+Specifies whether or not you want to apply the scale_factor<br><br>
+Default value is <cite>FALSE</cite><br><br>
+<br>
+<h3>custom_lineweight_display_units=</h3>
+<p>
+Define the unit of measure (inch or millimeters) used on CTB editor window, but lineweights are ALWAYS defined in inch millimeters.<br><br>
+Default value is <cite>0</cite><br><br>
+Set 1 for showing lineweight in inch.<br>
+<br>
+<h3>plot_style{</h3>
+<p>
+Descript various data of PlotStyle attributes<br><br>
+is writed in the form:<br><br>
+ NUMBER{<br>
+  name="Style NUMBER+1<br>
+  localized_name="Style NUMBER+1<br>
+  description="<br>
+  color=-1023410176<br>
+  mode_color=-1023410176<br>
+  color_policy=1<br>
+  physical_pen_number=1<br>
+  virtual_pen_number=1<br>
+  screen=100<br>
+  linepattern_size=0.5<br>
+  linetype=31<br>
+  adaptive_linetype=TRUE<br>
+  lineweight=0<br>
+  fill_style=73<br>
+  end_style=4<br>
+  join_style=5<br>
+ }<br>
+}<br>
+<br>
+<h4>name=</h4>
+<p>
+<!-- need more investigations for different languages-->
+Name of style.<br><br>
+Default value is <cite>"Style NUMBER+1</cite><br><br>
+the default value can be named in any other text by the user.<br>
+The first value (of the Style NUMBER=0) would be always <cite>Normal</cite>, this can not be renamed by the user.<br>
+<br>
+<h4>localized_name=</h4>
+<p>
+<!-- need more investigations for different languages-->
+Name of style in localized language.<br><br>
+Default value is <cite>"Style NUMBER+1</cite><br><br>
+in theory is in local language, but is always equal to name=<br>
+<br>
+<h4>description=</h4>
+<p>
+Custom description of named plot style table.<br><br>
+Default value is <cite>"</cite><br><br>
+Can't contain any <cite>\n</cite> and have a maximum characters of 4869.<br>
+This seems to be the longest possible line in the ctb file (15+4869+1=4885 byte of line)<br>
+<br>
+<h4>color=</h4>
+<p>
+<!-- need more investigations-->
+The printed color (a color on screen can be total different color on paper).<br><br>
+Default value is <cite>-1</cite> or <cite>-1006632961</cite><br><br>
+Screen color same as printed color value is <cite>-1</cite> or <cite>-1006632961</cite><br>
+Understanding the values is very difficult since they are expressed in a decimal way.<br><br>
+For example the decimal number <cite>-1006698496</cite> expressed as hex signed 2's complement is <cite>C3FF0000</cite>.<br><!-- red example -->
+divide the value in bytes: <cite>C3, FF, 00, 00</cite> that stands for: "color class", "Red", "Green", "Blue" (so the example is red color).<br>
+The "color class" value can be:<br>
+<cite>C0</cite> that stands for "BY LAYER", so the sequential bytes can be ignored;<br>
+<cite>C1</cite> that stands for "BY BLOCK", so the sequential bytes can be ignored;<br>
+<cite>C2</cite> that stands for "RGB that isn't listed in <a href="ACI.html" title="Autocad Colour Index">ACI</a>", the sequential bytes are RGB;<br>
+<cite>C3</cite> that stands for "<a href="ACI.html" title="Autocad Colour Index">ACI</a>", the sequential bytes are RGB.<br>
+<br>
+Problematics examples(that give me much headaches):<br>
+the default decimal number <cite>-1006632961</cite> expressed as hex signed 2's complement is <cite>C3FFFFFF</cite>.<br><!-- default white/object example -->
+Is an <a href="ACI.html" title="Autocad Colour Index">ACI</a> color, R=FF=255, G=FF=255, B=FF=255 so the default in theory is white.<br>
+This however is partially wrong, because <cite>C3FFFFFF</cite> is also "use object color".<br>
+<cite>C3FFFFFF</cite> stands for white only for (Color_255).<br>
+<br>
+the decimal number <cite>-1008877202</cite> expressed as hex signed 2's complement is <cite>C3DDC16E</cite>.<br><!-- wrong value example -->
+In theory is an <a href="ACI.html" title="Autocad Colour Index">ACI</a> color, but R=DD=221, G=C1=193, B=6E=110 isn't an <a href="ACI.html" title="Autocad Colour Index">ACI</a> possible value.<br>
+Here is where mode_color helps, if color is an impossible color number, the color seems to be defined with mode_color (honestly I don't understand why).<br>
+<br>
+<h4>mode_color=</h4>
+<p>
+<!-- need more investigations-->
+The scope is not very clear to me.<br><br>
+Default value is not clear<br><br>
+Optional,not present in all STB, so for writing a basic ctb maybe can be ignored.<br>
+Unlike the <a href="CTB.html" title="Color-dependent Plot Style Table">CTB</a> the mode_color presence can't be desumed by number of line, since STB have a variable number of plot style.<br>
+Need much more investigations.<br>
+If the color value is an <a href="ACI.html" title="Autocad Colour Index">ACI</a> mode_color==color.<br>
+If it's not the mode_color value differ to the color value.<br><br>
+For example the decimal number <cite>-1026767473</cite> expressed as hex signed 2's complement is <cite>C2CCC58F</cite>.<br><!-- RAL1000 example -->
+divide the value in bytes: <cite>C2, CC, C5, 8F</cite> that stands for: "RGB not listed in <a href="ACI.html" title="Autocad Colour Index">ACI</a>", "Red", "Green", "Blue" (so the example is RAL1000 expressed with RGB value).<br>
+<br>
+<h4>color_policy=</h4>
+<p>
+Set dithering and greyscale to on or off.<br><br>
+Default value is <cite>1</cite><br><br>
+Valid range from <cite>0</cite> to <cite>5</cite><br><br>
+Dithering Off & Greyscale Off value is <cite>0</cite><br>
+Dithering On & Greyscale Off value is <cite>1</cite><br>
+Greyscale On & Dithering Off value is <cite>2</cite><br>
+Greyscale On & Dithering On value is <cite>3</cite><br>
+Dithering Off & Greyscale Off & specified color value is <cite>4</cite><br>
+Dithering On & Greyscale Off & specified color value is <cite>5</cite><br>
+Dithering is a method to simulate more colors beyond the ink colors available with dot patterns, not all plotters support it and can be bugged or broken.<br>
+<br>
+<h4>physical_pen_number=</h4>
+<p>
+Specifies physical plotter pen.<br><br>
+Default value is <cite>0</cite><br><br>
+Valid range from <cite>0</cite> to <cite>32</cite><br><br>
+The value <cite>0</cite> stands for "AUTOMATIC"<br>
+<br>
+<h4>virtual_pen_number=</h4>
+<p>
+Many Ink-jet and laser plotter offer virtual pens to offer a simulation of pen plotters.<br>
+This parameter is used only on non-pen plotters if they are configured for virtual pens.<br><br>
+Default value is <cite>0</cite><br><br>
+Valid range from <cite>0</cite> to <cite>255</cite><br><br>
+The value <cite>0</cite> stands for "AUTOMATIC"<br>
+<br>
+<h4>screen=</h4>
+<p>
+Screening, specifies the ink intensity of the plot on the paper.<br><br>
+Default value is <cite>100</cite><br><br>
+Valid range is from <cite>0</cite> to <cite>100</cite><br><br>
+Full colour intensity is <cite>100</cite><br>
+No colour intensity (not printed at all) is <cite>0</cite><br>
+In order for screening to work, the dithering option seems to be automatically enabled.<br>
+<br>
+<h4>linepattern_size=</h4>
+<p>
+Line pattern size.<br>
+Default value is <cite>0.5</cite><br>
+<br>
+<h4>linetype=</h4>
+<p>
+Overrides the entity linetype.<br><br>
+Default value is <cite>31</cite><br><br>
+Valid range is from <cite>0</cite> to <cite>31</cite><br><br>
+<!-- need an image for explanation of difference-->
+Solid value is <cite>0</cite><br>
+Dashed value is <cite>1</cite><br>
+Dotted value is <cite>2</cite><br>
+Dash Dot value is <cite>3</cite><br>
+Short Dash value is <cite>4</cite><br>
+Medium Dash value is <cite>5</cite><br>
+Long Dash value is <cite>6</cite><br>
+Short Dash x2 value is <cite>7</cite><br>
+Medium Dash x2 value is <cite>8</cite><br>
+Long Dash x2 value is <cite>9</cite><br>
+Medium Lang Dash value is <cite>10</cite><br>
+Medium Dash Short Dash Short Dash value is <cite>11</cite><br>
+Long Dash Short Dash value is <cite>12</cite><br>
+Long Dash Dot Dot value is <cite>13</cite><br>
+Long Dash Dot value is <cite>14</cite><br>
+Medium Dash Dot Short Dash Dot value is <cite>15</cite><br>
+Sparse Dot value is <cite>16</cite><br>
+ISO Dash value is <cite>17</cite><br>
+ISO Dash Space value is <cite>18</cite><br>
+ISO Long Dash Dot value is <cite>19</cite><br>
+ISO Long Dash Double Dot value is <cite>20</cite><br>
+ISO Long Dash Triple Dot value is <cite>21</cite><br>
+ISO Dot value is <cite>22</cite><br>
+ISO Long Dash Short Dash value is <cite>23</cite><br>
+ISO Long Dash Double Short Dash value is <cite>24</cite><br>
+ISO Dash Dot value is <cite>25</cite><br>
+ISO Double Dash Dot value is <cite>26</cite><br>
+ISO Dash Double Dot value is <cite>27</cite><br>
+ISO Double Dash Double Dot value is <cite>28</cite><br>
+ISO Dash Triple Dot value is <cite>29</cite><br>
+ISO Double Dash Triple Dot value is <cite>30</cite><br>
+Use entity linetype value is <cite>31</cite><br>
+<br>
+<h4>adaptive_linetype=</h4>
+<p>
+Decide the priority of linetype pattern over linetype scaling.<br><br>
+Default value is <cite>TRUE</cite><br><br>
+If linetype pattern is more important than a correct linetype scaling the value is <cite>TRUE</cite><br>
+If correct linetype scaling is more important than linetype pattern the value is <cite>FALSE</cite><br>
+<br>
+<h4>lineweight=</h4>
+<p>
+Set the lineweight.<br><br>
+Default value is <cite>0</cite><br><br>
+Valid range is from <cite>0</cite> to <cite>26</cite><br><br>
+ as also specified in custom_lineweight_table( if custom_lineweight_table is modified the value above change):<br>
+ value <cite>0</cite> for 0.0mm <br>
+ value <cite>1</cite> for 0.05mm <br>
+ value <cite>2</cite> for 0.09mm <br>
+ value <cite>3</cite> for 0.1mm <br>
+ value <cite>4</cite> for 0.13mm <br>
+ value <cite>5</cite> for 0.15mm <br>
+ value <cite>6</cite> for 0.18mm <br>
+ value <cite>7</cite> for 0.2mm <br>
+ value <cite>8</cite> for 0.25mm <br>
+ value <cite>9</cite> for 0.3mm <br>
+ value <cite>10</cite> for 0.35mm <br>
+ value <cite>11</cite> for 0.4mm <br>
+ value <cite>12</cite> for 0.45mm <br>
+ value <cite>13</cite> for 0.5mm <br>
+ value <cite>14</cite> for 0.53mm <br>
+ value <cite>15</cite> for 0.6mm <br>
+ value <cite>16</cite> for 0.65mm <br>
+ value <cite>17</cite> for 0.7mm <br>
+ value <cite>18</cite> for 0.8mm <br>
+ value <cite>19</cite> for 0.9mm <br>
+ value <cite>20</cite> for 1.0mm <br>
+ value <cite>21</cite> for 1.06mm <br>
+ value <cite>22</cite> for 1.2mm <br>
+ value <cite>23</cite> for 1.4mm <br>
+ value <cite>24</cite> for 1.58mm <br>
+ value <cite>25</cite> for 2.0mm <br>
+ value <cite>26</cite> for 2.11mm <br>
+<br>
+<h4>fill_style=</h4>
+<p>
+Define the line fill style.<br><br>
+Default value is <cite>73</cite><br><br>
+Valid range is from <cite>64</cite> to <cite>73</cite><br><br>
+<!-- need an image for explanation of difference-->
+Solid value is <cite>64</cite><br>
+Checkerboard value is <cite>65</cite><br>
+Crosshatch value is <cite>66</cite><br>
+Diamonds value is <cite>67</cite><br>
+Horizontal bars value is <cite>68</cite><br>
+Slant left value is <cite>69</cite><br>
+Slant right value is <cite>70</cite><br>
+Square dots value is <cite>71</cite><br>
+Vertical bars value is <cite>72</cite><br>
+Object value is <cite>73</cite><br>
+<br>
+<h4>end_style=</h4>
+<p>
+Define the line end cap style.<br><br>
+Default value is <cite>4</cite><br><br>
+Valid range is from <cite>0</cite> to <cite>4</cite><br><br>
+<!-- need an image for explanation of difference-->
+Butt value is <cite>0</cite><br>
+Square value is <cite>1</cite><br>
+Round value is <cite>2</cite><br>
+Diamond value is <cite>3</cite><br>
+Object value is <cite>4</cite><br>
+<br>
+<h4>join_style=</h4>
+<p>
+Define the line end cap style.<br><br>
+Default value is <cite>5</cite><br><br>
+Valid range is from <cite>0</cite> to <cite>5</cite><br><br>
+<!-- need an image for explanation of difference-->
+Miter value is <cite>0</cite><br>
+Bevel value is <cite>1</cite><br>
+Round value is <cite>2</cite><br>
+Diamond value is <cite>3</cite><br>
+Object value is <cite>5</cite><br>
+<br>
+<br>
+<h3>custom_lineweight_table{</h3>
+<p>
+permit to change the lineweight values<br>
+is writed in the form:<br><br>
+<cite>
+ 0=0.0<br>
+ 1=0.05<br>
+ 2=0.09<br>
+ 3=0.1<br>
+ 4=0.13<br>
+ 5=0.15<br>
+ 6=0.18<br>
+ 7=0.2<br>
+ 8=0.25<br>
+ 9=0.3<br>
+ 10=0.35<br>
+ 11=0.4<br>
+ 12=0.45<br>
+ 13=0.5<br>
+ 14=0.53<br>
+ 15=0.6<br>
+ 16=0.65<br>
+ 17=0.7<br>
+ 18=0.8<br>
+ 19=0.9<br>
+ 20=1.0<br>
+ 21=1.06<br>
+ 22=1.2<br>
+ 23=1.4<br>
+ 24=1.58<br>
+ 25=2.0<br>
+ 26=2.11<br>
+}<br>
+</cite><br>
+
+</body>
+</html>
