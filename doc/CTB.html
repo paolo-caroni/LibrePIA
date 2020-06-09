@@ -11,7 +11,7 @@
 	</style>
 </head>
 <body bgcolor=#ffffff>
-<h1>CTB Color-dependent Plot Style</h1>
+<h1>CTB Color-dependent Plot Style Table</h1>
 <p>
 CTB is a file extension for a color settings file used with AutoDesk AutoCAD software.<br>
 CTB files contain color dependent plot styles, used to attach color and display settings to design objects.<br>
@@ -88,6 +88,7 @@ is writed in the form:<br><br>
   linepattern_size=0.5<br>
   linetype=31<br>
   adaptive_linetype=TRUE<br>
+  lineweight=0<br>
   fill_style=73<br>
   end_style=4<br>
   join_style=5<br>
@@ -112,7 +113,7 @@ in theory is in local language, but is always equal to name=<br>
 <br>
 <h4>description=</h4>
 <p>
-Custom description of color plot style.<br><br>
+Custom description of color plot style table.<br><br>
 Default value is <cite>"</cite> or <cite>"Description_NUMBER+1</cite><br><br>
 the default value <cite>Description</cite> can be named in other language (like <cite>Descrizione</cite> in Italian).<br>
 Can't contain any <cite>\n</cite> and have a maximum characters of 4869.<br>
@@ -300,29 +301,32 @@ Object value is <cite>73</cite><br>
 Define the line end cap style.<br><br>
 Default value is <cite>4</cite><br><br>
 Valid range is from <cite>0</cite> to <cite>4</cite><br><br>
-<!-- need an image for explanation of difference-->
 Butt value is <cite>0</cite><br>
 Square value is <cite>1</cite><br>
 Round value is <cite>2</cite><br>
 Diamond value is <cite>3</cite><br>
-Object value is <cite>4</cite><br>
+Object value is <cite>4</cite><br><br>
+See the image for explanation of butt, square, round and diamond:<br>
+<img src="image/End_Style.png" alt="End Style" style="margin: 10px"><br>
+</div>
 <br>
 <h4>join_style=</h4>
 <p>
 Define the line end cap style.<br><br>
 Default value is <cite>5</cite><br><br>
 Valid range is from <cite>0</cite> to <cite>5</cite><br><br>
-<!-- need an image for explanation of difference-->
 Miter value is <cite>0</cite><br>
 Bevel value is <cite>1</cite><br>
 Round value is <cite>2</cite><br>
 Diamond value is <cite>3</cite><br>
-Object value is <cite>5</cite><br>
+Object value is <cite>5</cite><br><br>
+See the image for explanation of miter, bevel, round and diamond:<br>
+<img src="image/Join_Style.png" alt="Join Style" style="margin: 10px"><br>
 <br>
 <br>
 <h3>custom_lineweight_table{</h3>
 <p>
-permit to change the lineweight values<br>
+permit to change the lineweight values (always expressed in mm)<br>
 is writed in the form:<br><br>
 <cite>
  0=0.0<br>
