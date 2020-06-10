@@ -97,7 +97,7 @@ int k=0,PIA_uncompressed_line_number=0;
     /* debug function*/
     #if DEBUG
     printf("expected compressed size: %d\n", readed_compressed_size);
-    printf("expected decompressed size: %d\n", readed_decompressed_size-48-4-4-4);
+    printf("expected decompressed size: %d\n", readed_decompressed_size);
     #endif
 
     /* close input and output file*/
@@ -119,7 +119,7 @@ int k=0,PIA_uncompressed_line_number=0;
     char buffer[readed_compressed_size];
     /* declare data, data size is equal to decompressed size without header(48byte), Adler 32 checksum(4byte), 
     decompressed size (4byte) and compressed size(4byte), in total (60byte)*/
-    char data[readed_decompressed_size-48-4-4-4];
+    char data[readed_decompressed_size];
     /* number of byte readed*/
     int num_read = 0;
 
@@ -154,8 +154,8 @@ int k=0,PIA_uncompressed_line_number=0;
        inflate(&infstream, Z_NO_FLUSH);
        inflateEnd(&infstream);
 
-       /* write uncompressed data*/
-       fwrite(data, 1, readed_decompressed_size-60, outfile);
+       /* write uncompressed data removing last NULL byte*/
+       fwrite(data, 1, readed_decompressed_size-1, outfile);
 
        /* Obtain information of output file size*/
        unsigned long output_file_size = ftell(outfile);
@@ -174,7 +174,6 @@ int k=0,PIA_uncompressed_line_number=0;
        #if DEBUG
        printf("uncompressed data splitted in %d lines\n", PIA_uncompressed_line_number);
        #endif
-
     }
 
     /* close input and output file*/
@@ -291,7 +290,7 @@ int k=0,PIA_uncompressed_line_number=0;
 	
     /* remove old value from k*/
     k=0;
-    for(k=0;k<max_style;k++)
+    for(k=0;k<max_style+1;k++)
     {
        /* color/named plot style value color init (number)*/
        fgets(line_buffer,sizeof(line_buffer),infile);
@@ -334,20 +333,20 @@ int k=0,PIA_uncompressed_line_number=0;
        #if DEBUG
        printf("color=%d\n",color[k]);
        #endif
-       /* Verify if mode_color is present*/
-	   /* at the start I have used the PIA_uncompressed_line_number for verify... but for stb that isn't possible, so I want to uniform the code 
-       if (PIA_uncompressed_line_number>4700)*/
-	   if (line_buffer[1]=='m' && line_buffer[2]=='o' && line_buffer[3]=='d' && line_buffer[4]=='e' && line_buffer[5]=='_' && line_buffer[6]=='c')
-       {
-       /* color/named plot style value mode_color*/
+       /* get the string that can contain mode_color or color_policy*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       sscanf(line_buffer,"  mode_color=%d",&mode_color[k]);
-       #if DEBUG
-       printf("mode_color=%d\n",mode_color[k]);
-       #endif
+       /* Verify if mode_color is present*/
+       if (line_buffer[2]=='m' && line_buffer[3]=='o' && line_buffer[4]=='d' && line_buffer[5]=='e' && line_buffer[6]=='_' && line_buffer[7]=='c')
+       {
+          /* color/named plot style value mode_color*/
+          sscanf(line_buffer,"  mode_color=%d",&mode_color[k]);
+          #if DEBUG
+          printf("mode_color=%d\n",mode_color[k]);
+          #endif
+          /* get the string that contain color_policy*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
        }
        /* color/named plot style value color_policy*/
-       fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  color_policy=%d",&color_policy[k]);
        #if DEBUG
        printf("color_policy=%d\n",color_policy[k]);
@@ -430,7 +429,8 @@ int k=0,PIA_uncompressed_line_number=0;
        }
        else
        {
-         fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+          fprintf(stderr, "ERROR, on plot style number %d\n", k);
+          fprintf(stderr, "expected \"}\" obtained \"%c\"\n", line_buffer[1]);
        }
     }
 
@@ -443,7 +443,7 @@ int k=0,PIA_uncompressed_line_number=0;
        }
        else
        {
-          fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+          fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
        }
     }
     /* read custom_lineweight_table*/
@@ -460,15 +460,15 @@ int k=0,PIA_uncompressed_line_number=0;
     sscanf(line_buffer," 0=%f",&custom_lineweight_table[0]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 1=%f",&custom_lineweight_table[1]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 2=%f",&custom_lineweight_table[2]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 3=%f",&custom_lineweight_table[3]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 4=%f",&custom_lineweight_table[4]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 5=%f",&custom_lineweight_table[5]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 6=%f",&custom_lineweight_table[6]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 7=%f",&custom_lineweight_table[7]);
@@ -476,15 +476,15 @@ int k=0,PIA_uncompressed_line_number=0;
     sscanf(line_buffer," 8=%f",&custom_lineweight_table[8]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 9=%f",&custom_lineweight_table[9]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 10=%f",&custom_lineweight_table[10]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 11=%f",&custom_lineweight_table[11]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 12=%f",&custom_lineweight_table[12]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 13=%f",&custom_lineweight_table[13]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 14=%f",&custom_lineweight_table[14]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 15=%f",&custom_lineweight_table[15]);
@@ -492,15 +492,15 @@ int k=0,PIA_uncompressed_line_number=0;
     sscanf(line_buffer," 16=%f",&custom_lineweight_table[16]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 17=%f",&custom_lineweight_table[17]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 18=%f",&custom_lineweight_table[18]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 19=%f",&custom_lineweight_table[19]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 20=%f",&custom_lineweight_table[20]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 21=%f",&custom_lineweight_table[21]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 22=%f",&custom_lineweight_table[22]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 23=%f",&custom_lineweight_table[23]);
@@ -508,7 +508,7 @@ int k=0,PIA_uncompressed_line_number=0;
     sscanf(line_buffer," 24=%f",&custom_lineweight_table[24]);
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 25=%f",&custom_lineweight_table[25]);
-	fgets(line_buffer,sizeof(line_buffer),infile);
+    fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 26=%f",&custom_lineweight_table[26]);
     /* read the end of custom_lineweight_table*/
     fgets(line_buffer,sizeof(line_buffer),infile);
@@ -517,7 +517,7 @@ int k=0,PIA_uncompressed_line_number=0;
     }
     else
     {
-       fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+       fprintf(stderr, "end of custom_lineweight_table ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
     }
 	/* close input file*/
     fclose(infile);
