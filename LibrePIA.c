@@ -22,7 +22,7 @@
 #include <string.h>
 #include <zlib.h>
 /* include header files*/
-#include "ctb.h"
+#include "plot_style_table.h"
 
 /* declare header and info common to all PIA files*/
 unsigned char header[37],header2[11],checksum[12],line_buffer[4900];
@@ -31,7 +31,7 @@ int k=0,PIA_uncompressed_line_number=0;
 /*int PIA_ver=0, subclass_ver=0; unused*/
 
 
-/* obtain information of version,file subclass type and sizes*/
+ /* obtain information of version,file subclass type and sizes*/
  unsigned long read_header(char *infilename)
  {
     /* open compressed PIA file but without zlib*/
@@ -105,7 +105,7 @@ int k=0,PIA_uncompressed_line_number=0;
  }
 
 
-/* funtion for unzip PIA file*/
+ /* funtion for unzip PIA file*/
  int decompress_data(char *infilename, char *outfilename)
  {
     /* open compressed PIA file*/
@@ -182,14 +182,9 @@ int k=0,PIA_uncompressed_line_number=0;
     fclose(outfile);
  }
 
-/* funtion for read CTB uncompressed text form file*/
- int ctb_parser(char *infilename)
+ /* funtion for read CTB or STB uncompressed text form file*/
+ int plot_style_parser(char *infilename)
  {
-     fprintf(stderr, "Work in progress...\n");
-
-    /* remove old value from k*/
-    k=0;
-
     /* open decompressed PIA file, this is very stupid, there is the data string,
     but I don't know how analyze it... needs more C abilities*/
     FILE *infile = fopen(infilename, "rb");
@@ -242,41 +237,46 @@ int k=0,PIA_uncompressed_line_number=0;
     printf("custom_lineweight_display_units=%d\n",custom_lineweight_display_units);
     #endif
 
-    /* line 6 to 262 read aci_table as matrix*/
-    fgets(line_buffer,sizeof(line_buffer),infile);
-    if(line_buffer[0]=='a' && line_buffer[1]=='c' && line_buffer[2]=='i'&& line_buffer[3]=='_' && line_buffer[4]=='t' && line_buffer[5]=='a')
+    /* if aci_table_available is set to TRUE (ctb) then read aci_table */
+    if (aci_table_available==84)
     {
-    }
-    else
-    {
-    #if DEBUG
-    printf("aci_table on wrong line\n");
-    printf("%s\n",line_buffer);
-    #endif
-    }
-    /* get line 7 to 261 (255 values)*/
-    for(k=0;k<255;k++)
-    {
-    /* stupid code, try new approach*/
-    fgets(aci_table[k],20,infile);
-    #if DEBUG
-    printf("%s",aci_table[k]);
-    #endif
-    }
-    /* line 262 end of aci_table*/
-    fgets(line_buffer,sizeof(line_buffer),infile);
-    if(line_buffer[0]=='}')
-    {
-    }
-    else
-    {
-    #if DEBUG
-    printf("end of aci_table on wrong line\n");
-    printf("expected } obtained %c\n",line_buffer[0]);
-    #endif
-    }
+       /* only for ctb line 6 to 262 read aci_table as matrix*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       if(line_buffer[0]=='a' && line_buffer[1]=='c' && line_buffer[2]=='i'&& line_buffer[3]=='_' && line_buffer[4]=='t' && line_buffer[5]=='a')
+       {
+       }
+       else
+       {
+       #if DEBUG
+       printf("aci_table on wrong line\n");
+       printf("%s\n",line_buffer);
+       #endif
+       }
 
-    /* line 263 start of plot_style sctruct*/
+        /* remove old value from k*/
+        k=0;
+       /* only for ctb get line 7 to 261 (255 values)*/
+       for(k=0;k<255;k++)
+       {
+       /* stupid code, try new approach*/
+       fgets(aci_table[k],20,infile);
+       #if DEBUG
+       printf("%s",aci_table[k]);
+       #endif
+       }
+       /* only for ctb line 262 end of aci_table*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       if(line_buffer[0]=='}')
+       {
+       }
+       else
+       {
+       fprintf(stderr,"end of aci_table on wrong line\n");
+       fprintf(stderr,"expected } obtained %c\n",line_buffer[0]);
+       }
+	}
+
+    /* start of plot_style sctruct (line 263 on ctb, line 6 on stb)*/
     fgets(line_buffer,sizeof(line_buffer),infile);
     if(line_buffer[0]=='p' && line_buffer[1]=='l' && line_buffer[2]=='o'&& line_buffer[3]=='t' && line_buffer[4]=='_' && line_buffer[5]=='s')
     {
@@ -288,100 +288,109 @@ int k=0,PIA_uncompressed_line_number=0;
     printf("%s\n",line_buffer);
     #endif
     }
-
+	
+    /* remove old value from k*/
     k=0;
-    for(k=0;k<254;k++)
+    for(k=0;k<max_style;k++)
     {
-       /* color value color init (number)*/
+       /* color/named plot style value color init (number)*/
        fgets(line_buffer,sizeof(line_buffer),infile);
 /* known bug segmentation fault
-       sscanf(line_buffer,"%d{",color_number[k]);
+       sscanf(line_buffer," %3[^{]",style_number[k]);
        //#if DEBUG
-       if(k!=color_number[k])
+       if(k!=style_number[k])
        {
-       printf("wrong color number, expected \"%d\" found \"%d\"\n", k, color_number[k]);
+       printf("wrong plot style number, expected \"%d\" found \"%d\"\n", k, style_number[k]);
        }
        //#endif
 */
-       /* color value name*/
+       /* on stb the plot_style number is variable, so it's better to verify the max_style number*/
+       if (line_buffer[0]=='}')
+       {
+       /* this is the end of plot_style*/
+       max_style=k;
+       }
+       /* color/named plot style value name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  name=%12s",&name[k]);
        #if DEBUG
        printf("name=%s\n",name[k]);
        #endif
-       /* color value localized_name*/
+       /* color/named plot style value localized_name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  localized_name=%12s",&localized_name[k]);
        #if DEBUG
        printf("localized_name=%s\n",localized_name[k]);
        #endif
-       /* color value description*/
+       /* color/named plot style value description*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  description=%[^\n]",&description[k]);
        #if DEBUG
        printf("description=%s\n",description[k]);
        #endif
-       /* color value color*/
+       /* color/named plot style value color*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  color=%d",&color[k]);
        #if DEBUG
        printf("color=%d\n",color[k]);
        #endif
        /* Verify if mode_color is present*/
-       if (PIA_uncompressed_line_number>4700)
+	   /* at the start I have used the PIA_uncompressed_line_number for verify... but for stb that isn't possible, so I want to uniform the code 
+       if (PIA_uncompressed_line_number>4700)*/
+	   if (line_buffer[1]=='m' && line_buffer[2]=='o' && line_buffer[3]=='d' && line_buffer[4]=='e' && line_buffer[5]=='_' && line_buffer[6]=='c')
        {
-       /* color value mode_color*/
+       /* color/named plot style value mode_color*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  mode_color=%d",&mode_color[k]);
        #if DEBUG
        printf("mode_color=%d\n",mode_color[k]);
        #endif
        }
-       /* color value color_policy*/
+       /* color/named plot style value color_policy*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  color_policy=%d",&color_policy[k]);
        #if DEBUG
        printf("color_policy=%d\n",color_policy[k]);
        #endif
-       /* color value physical_pen_number*/
+       /* color/named plot style value physical_pen_number*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  physical_pen_number=%d",&physical_pen_number[k]);
        #if DEBUG
        printf("physical_pen_number=%d\n",physical_pen_number[k]);
        #endif
-       /* color value virtual_pen_number*/
+       /* color/named plot style value virtual_pen_number*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," virtual_pen_number=%d",&virtual_pen_number[k]);
        #if DEBUG
        printf("virtual_pen_number=%d\n",virtual_pen_number[k]);
        #endif
-       /* color value screen*/
+       /* color/named plot style value screen*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," screen=%d",&screen[k]);
        #if DEBUG
        printf("screen=%d\n",screen[k]);
        #endif
-       /* color value linepattern_size*/
+       /* color/named plot style value linepattern_size*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," linepattern_size=%f",&linepattern_size[k]);
        #if DEBUG
        printf("linepattern_size=%1.1f\n",linepattern_size[k]);
        #endif
-       /* color value linetype*/
+       /* color/named plot style value linetype*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," linetype=%d",&linetype[k]);
        #if DEBUG
        printf("linetype=%d\n",linetype[k]);
        #endif
-       /* color value adaptive_linetype (TRUE or FALSE)*/
+       /* color/named plot style value adaptive_linetype (TRUE or FALSE)*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," adaptive_linetype=%c",&adaptive_linetype[k]);
        #if DEBUG
-       if (aci_table_available==84)
+       if (adaptive_linetype[k]==84)
        {
        printf("adaptive_linetype=TRUE\n");
        }
-       else if (aci_table_available==70)
+       else if (adaptive_linetype[k]==70)
        {
        printf("adaptive_linetype=FALSE\n");
        }
@@ -390,31 +399,31 @@ int k=0,PIA_uncompressed_line_number=0;
        printf("adaptive_linetype=%d\n",adaptive_linetype[k]);
        }
        #endif
-       /* color value lineweight*/
+       /* color/named plot style value lineweight*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," lineweight=%d",&lineweight[k]);
        #if DEBUG
        printf("lineweight=%d\n",lineweight[k]);
        #endif
-       /* color value fill_style*/
+       /* color/named plot style value fill_style*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," fill_style=%d",&fill_style[k]);
        #if DEBUG
        printf("fill_style=%d\n",fill_style[k]);
        #endif
-       /* color value end_style*/
+       /* color/named plot style value end_style*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," end_style=%d",&end_style[k]);
        #if DEBUG
        printf("end_style=%d\n",end_style[k]);
        #endif
-       /* color value join_style*/
+       /* color/named plot style value join_style*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer," join_style=%d",&join_style[k]);
        #if DEBUG
        printf("join_style=%d\n",join_style[k]);
        #endif
-       /* color value end of color }*/
+       /* color/named plot style value end of color }*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        if (line_buffer[1]=='}')
        {
@@ -425,16 +434,18 @@ int k=0,PIA_uncompressed_line_number=0;
        }
     }
 
-    /* read the end of plot_style*/
-    fgets(line_buffer,sizeof(line_buffer),infile);
-    if (line_buffer[0]=='}')
+    if (max_style=254)
     {
+       /* read the end of plot_style only in case that is not yet readed*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       if (line_buffer[0]=='}')
+       {
+       }
+       else
+       {
+          fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+       }
     }
-    else
-    {
-       fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
-    }
-
     /* read custom_lineweight_table*/
     fgets(line_buffer,sizeof(line_buffer),infile);
     if (line_buffer[0]=='c' && line_buffer[1]=='u' && line_buffer[2]=='s' && line_buffer[3]=='t' && line_buffer[4]=='o' && line_buffer[5]=='m')
@@ -444,13 +455,72 @@ int k=0,PIA_uncompressed_line_number=0;
     {
        fprintf(stderr, "ERROR!\nexpected: \"custom_lineweight_table{\"\nobtained: \"%s\"", line_buffer);
     }
-    /* read value from custom_lineweight_table*/
-    k=0;
-    for(k=0;k<27;k++)
-    {
+    /* read values from custom_lineweight_table*/
     fgets(line_buffer,sizeof(line_buffer),infile);
-//    sscanf(line_buffer," %d=%f",number,&custom_lineweight_table[k]);
+    sscanf(line_buffer," 0=%f",&custom_lineweight_table[0]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 1=%f",&custom_lineweight_table[1]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 2=%f",&custom_lineweight_table[2]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 3=%f",&custom_lineweight_table[3]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 4=%f",&custom_lineweight_table[4]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 5=%f",&custom_lineweight_table[5]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 6=%f",&custom_lineweight_table[6]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 7=%f",&custom_lineweight_table[7]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 8=%f",&custom_lineweight_table[8]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 9=%f",&custom_lineweight_table[9]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 10=%f",&custom_lineweight_table[10]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 11=%f",&custom_lineweight_table[11]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 12=%f",&custom_lineweight_table[12]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 13=%f",&custom_lineweight_table[13]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 14=%f",&custom_lineweight_table[14]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 15=%f",&custom_lineweight_table[15]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 16=%f",&custom_lineweight_table[16]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 17=%f",&custom_lineweight_table[17]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 18=%f",&custom_lineweight_table[18]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 19=%f",&custom_lineweight_table[19]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 20=%f",&custom_lineweight_table[20]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 21=%f",&custom_lineweight_table[21]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 22=%f",&custom_lineweight_table[22]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 23=%f",&custom_lineweight_table[23]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 24=%f",&custom_lineweight_table[24]);
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 25=%f",&custom_lineweight_table[25]);
+	fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," 26=%f",&custom_lineweight_table[26]);
+    /* read the end of custom_lineweight_table*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if (line_buffer[0]=='}')
+    {
     }
+    else
+    {
+       fprintf(stderr, "ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+    }
+	/* close input file*/
+    fclose(infile);
  }
 
  /* proof of concept for decompress PIA file in a text form,
@@ -462,12 +532,13 @@ int k=0,PIA_uncompressed_line_number=0;
     /* Verify subclass type*/
     if (header[19]=='C' && header[20]=='T' && header[21]=='B')
     {
-    ctb_parser(argv[2]);
+    plot_style_parser(argv[2]);
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
-    fprintf(stderr, "Sorry, the .stb subclass type isn't yet supported\n\n");
+    plot_style_parser(argv[2]);
+    fprintf(stderr, "Sorry, the .stb subclass type isn't yet debugged\n\n");
     }
 
     else if (header[19]=='P' && header[20]=='C' && header[21]=='3')
