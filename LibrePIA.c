@@ -254,8 +254,8 @@ int k=0,PIA_uncompressed_line_number=0;
 
         /* remove old value from k*/
         k=0;
-       /* only for ctb get line 7 to 261 (255 values)*/
-       for(k=0;k<255;k++)
+       /* only for ctb get line 7 to 261 (254 values)*/
+       for(k=0;k<=254;k++)
        {
        /* stupid code, try new approach*/
        fgets(aci_table[k],20,infile);
@@ -519,38 +519,166 @@ int k=0,PIA_uncompressed_line_number=0;
     fclose(infile);
  }
 
+ /* funtion for write CTB uncompressed text form file*/
+ int ctb_writer()
+ {
+    /* create new uncompressed .txt file*/
+    FILE *writed = fopen("output.txt", "wb");
+
+    /* Parse ctb file*/
+    /* first line, description, can contain space*/
+    fprintf(writed,"description=%s\n",file_description);
+    /* second line, aci_table_available, always TRUE*/
+    fprintf(writed,"aci_table_available=TRUE\n");
+    /* third line, scale_factor*/
+    fprintf(writed,"scale_factor=%1.1f\n",scale_factor);
+    /* fourth line, apply factor*/
+    if (apply_factor==84)
+    {
+    fprintf(writed,"apply_factor=TRUE\n");
+    }
+    else if (apply_factor==70)
+    {
+    fprintf(writed,"apply_factor=FALSE\n");
+    }
+    /* if impossible value set to default*/
+    else
+    {
+    fprintf(writed,"apply_factor=TRUE\n");
+    }
+    /* fifth line, custom_lineweight_display_units*/
+    fprintf(writed,"custom_lineweight_display_units=%d\n",custom_lineweight_display_units);
+    /* line 6 start of aci_table*/
+    fprintf(writed,"aci_table{\n");
+    /* remove old value from k*/
+    k=0;
+    /* line 7 to 261 (254 values)*/
+    for(k=0;k<=254;k++)
+    {
+       /* write aci_table values*/
+       fprintf(writed," %d=%s\n",k,name[k]);
+    }
+    /* line 262 end of aci_table*/
+    fprintf(writed,"}\n");
+    /* line 263 start of plot_style struct*/
+    fprintf(writed,"plot_style{\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<=max_style;k++)
+    {
+       /* color plot style value color init (number)*/
+       fprintf(writed," %d{\n",k);
+       /* color plot style value name*/
+       fprintf(writed,"  name=%s\n",name[k]);
+       /* color plot style value localized_name*/
+       fprintf(writed,"  localized_name=%s\n",localized_name[k]);
+       /* color plot style value description*/
+       fprintf(writed,"  description=%s\n",description[k]);
+       /* color plot style value color*/
+       fprintf(writed,"  color=%d\n",color[k]);
+       /* Verify if mode_color exist*/
+       if (mode_color[k]!='\0')
+       {
+          /* color plot style value mode_color*/
+          fprintf(writed,"  mode_color=%d\n",mode_color[k]);
+       }
+       /* color plot style value color_policy*/
+       fprintf(writed,"  color_policy=%d\n",color_policy[k]);
+       /* color plot style value physical_pen_number*/
+       fprintf(writed,"  physical_pen_number=%d\n",physical_pen_number[k]);
+       /* color plot style value virtual_pen_number*/
+       fprintf(writed,"  virtual_pen_number=%d\n",virtual_pen_number[k]);
+       /* color plot style value screen*/
+       fprintf(writed,"  screen=%d\n",screen[k]);
+       /* color plot style value linepattern_size*/
+       fprintf(writed,"  linepattern_size=%1.1f\n",linepattern_size[k]);
+       /* color plot style value linetype*/
+       fprintf(writed,"  linetype=%d\n",linetype[k]);
+       /* color plot style value adaptive_linetype (TRUE or FALSE)*/
+       if (adaptive_linetype[k]==84)
+       {
+       fprintf(writed,"  adaptive_linetype=TRUE\n");
+       }
+       else if (adaptive_linetype[k]==70)
+       {
+       fprintf(writed,"  adaptive_linetype=FALSE\n");
+       }
+       /* if impossible value set to default*/
+       else
+       {
+       fprintf(writed,"  adaptive_linetype=TRUE\n");
+       }
+       /* color plot style value lineweight*/
+       fprintf(writed,"  lineweight=%d\n",lineweight[k]);
+       /* color plot style value fill_style*/
+       fprintf(writed,"  fill_style=%d\n",fill_style[k]);
+       /* color plot style value end_style*/
+       fprintf(writed,"  end_style=%d\n",end_style[k]);
+       /* color plot style value join_style*/
+       fprintf(writed,"  join_style=%d\n",join_style[k]);
+       /* color plot style value end of color }*/
+       fprintf(writed," }\n");
+    }
+    /* write the end of plot_style*/
+    fprintf(writed,"}\n");
+    /* write custom_lineweight_table*/
+    fprintf(writed,"custom_lineweight_table{\n");
+    /* write values from custom_lineweight_table*/
+    k=0;
+    for(k=0;k<=26;k++)
+    {
+       /* custom_lineweight_table have a curious significant digits mode not totaly compatible with printf %g*/
+       if(custom_lineweight_table[k]==0.0 || custom_lineweight_table[k]==1.0 || custom_lineweight_table[k]==2.0 || custom_lineweight_table[k]==3.0)
+       {
+          fprintf(writed," %d=%1.1f\n",k,custom_lineweight_table[k]);
+       }
+       else
+       {
+          fprintf(writed," %d=%g\n",k,custom_lineweight_table[k]);
+       }
+    }
+    /* write the end of custom_lineweight_table*/
+    fprintf(writed,"}\n");
+    /* close output file*/
+    fclose(writed);
+ }
+
  /* proof of concept for decompress PIA file in a text form,
  can be used for all PIA file (ctb, stb, pc3, pmp)*/
  int main(int argc, char **argv)
  {
     read_header(argv[1]);
     decompress_data(argv[1],argv[2]);
-    /* Verify subclass type*/
+    /* verify subclass type*/
     if (header[19]=='C' && header[20]=='T' && header[21]=='B')
     {
-    plot_style_parser(argv[2]);
+       /* parse ctb*/
+       plot_style_parser(argv[2]);
+       /* write other txt for ctb*/
+       ctb_writer();
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
-    plot_style_parser(argv[2]);
-    fprintf(stderr, "Sorry, the .stb subclass type isn't yet debugged\n\n");
+       /* parse stb*/
+       plot_style_parser(argv[2]);
+       fprintf(stderr, "Sorry, the .stb subclass type isn't yet debugged\n");
     }
 
     else if (header[19]=='P' && header[20]=='C' && header[21]=='3')
     {
-    fprintf(stderr, "Sorry, the .pc3 subclass type isn't yet supported.\nMaybe .pc3 would be never supported since is correlated to .hdi file.\n\n");
+       fprintf(stderr, "Sorry, the .pc3 subclass type isn't yet supported.\nMaybe .pc3 would be never supported since is correlated to .hdi file.\n\n");
     }
 
     else if (header[19]=='P' && header[20]=='M' && header[21]=='P')
     {
-    fprintf(stderr, "Sorry, the .pmp subclass type isn't yet supported.\nThe support of .pmp. isn't a priority.\n\n");
+       fprintf(stderr, "Sorry, the .pmp subclass type isn't yet supported.\nThe support of .pmp. isn't a priority.\n\n");
     }
 
     /* if in the header there is something wrong*/
     else
     {
-    fprintf(stderr, "WARNING:This isn't a known subclass type\n\n");
+       fprintf(stderr, "WARNING:This isn't a known subclass type\n\n");
     }
  }
 
