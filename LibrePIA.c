@@ -287,13 +287,15 @@ int k=0,PIA_uncompressed_line_number=0;
     printf("%s\n",line_buffer);
     #endif
     }
-	
+
+    /* first line in plot_style the next lines are readen on for loop*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+
     /* remove old value from k*/
     k=0;
-    for(k=0;k<max_style+1;k++)
+    for(k=0;k<=max_style;k++)
     {
        /* color/named plot style value color init (number)*/
-       fgets(line_buffer,sizeof(line_buffer),infile);
 /* known bug segmentation fault
        sscanf(line_buffer," %3[^{]",style_number[k]);
        //#if DEBUG
@@ -303,12 +305,6 @@ int k=0,PIA_uncompressed_line_number=0;
        }
        //#endif
 */
-       /* on stb the plot_style number is variable, so it's better to verify the max_style number*/
-       if (line_buffer[0]=='}')
-       {
-       /* this is the end of plot_style*/
-       max_style=k;
-       }
        /* color/named plot style value name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  name=%12s",&name[k]);
@@ -432,20 +428,20 @@ int k=0,PIA_uncompressed_line_number=0;
           fprintf(stderr, "ERROR, on plot style number %d\n", k);
           fprintf(stderr, "expected \"}\" obtained \"%c\"\n", line_buffer[1]);
        }
-    }
-
-    if (max_style=254)
-    {
-       /* read the end of plot_style only in case that is not yet readed*/
+       /* read the end of plot_style or the next color/named plot style value color init (number)*/
        fgets(line_buffer,sizeof(line_buffer),infile);
+       /* on stb the plot_style number is variable, so it's better to verify the max_style number*/
        if (line_buffer[0]=='}')
        {
+          /* this is the end of plot_style*/
+          max_style=k;
        }
-       else
+       else if (k==254 && line_buffer[0]!='}')
        {
-          fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+          fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
        }
     }
+
     /* read custom_lineweight_table*/
     fgets(line_buffer,sizeof(line_buffer),infile);
     if (line_buffer[0]=='c' && line_buffer[1]=='u' && line_buffer[2]=='s' && line_buffer[3]=='t' && line_buffer[4]=='o' && line_buffer[5]=='m')
