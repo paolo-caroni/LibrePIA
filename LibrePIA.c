@@ -307,13 +307,13 @@ int k=0,PIA_uncompressed_line_number=0;
 */
        /* color/named plot style value name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       sscanf(line_buffer,"  name=%12s",&name[k]);
+       sscanf(line_buffer,"  name=%[^\n]",&name[k]);
        #if DEBUG
        printf("name=%s\n",name[k]);
        #endif
        /* color/named plot style value localized_name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       sscanf(line_buffer,"  localized_name=%12s",&localized_name[k]);
+       sscanf(line_buffer,"  localized_name=%[^\n]",&localized_name[k]);
        #if DEBUG
        printf("localized_name=%s\n",localized_name[k]);
        #endif
@@ -519,8 +519,8 @@ int k=0,PIA_uncompressed_line_number=0;
     fclose(infile);
  }
 
- /* funtion for write CTB uncompressed text form file*/
- int ctb_writer()
+ /* funtion for write CTB or STB uncompressed text*/
+ int plot_style_writer()
  {
     /* create new uncompressed .txt file*/
     FILE *writed = fopen("output.txt", "wb");
@@ -528,38 +528,50 @@ int k=0,PIA_uncompressed_line_number=0;
     /* Parse ctb file*/
     /* first line, description, can contain space*/
     fprintf(writed,"description=%s\n",file_description);
-    /* second line, aci_table_available, always TRUE*/
-    fprintf(writed,"aci_table_available=TRUE\n");
+    /* second line, aci_table_available, always TRUE for ctb*/
+    if (aci_table_available==84)
+    {
+       fprintf(writed,"aci_table_available=TRUE\n");
+    }
+    /* always FALSE for stb*/
+    else if (aci_table_available==70)
+    {
+       fprintf(writed,"aci_table_available=FALSE\n");
+    }
     /* third line, scale_factor*/
     fprintf(writed,"scale_factor=%1.1f\n",scale_factor);
     /* fourth line, apply factor*/
     if (apply_factor==84)
     {
-    fprintf(writed,"apply_factor=TRUE\n");
+       fprintf(writed,"apply_factor=TRUE\n");
     }
     else if (apply_factor==70)
     {
-    fprintf(writed,"apply_factor=FALSE\n");
+       fprintf(writed,"apply_factor=FALSE\n");
     }
     /* if impossible value set to default*/
     else
     {
-    fprintf(writed,"apply_factor=TRUE\n");
+       fprintf(writed,"apply_factor=TRUE\n");
     }
     /* fifth line, custom_lineweight_display_units*/
     fprintf(writed,"custom_lineweight_display_units=%d\n",custom_lineweight_display_units);
-    /* line 6 start of aci_table*/
-    fprintf(writed,"aci_table{\n");
-    /* remove old value from k*/
-    k=0;
-    /* line 7 to 261 (254 values)*/
-    for(k=0;k<=254;k++)
+    /* if aci_table_available is TRUE (ctb)*/
+    if (aci_table_available==84)
     {
-       /* write aci_table values*/
-       fprintf(writed," %d=%s\n",k,name[k]);
+       /* line 6 start of aci_table*/
+       fprintf(writed,"aci_table{\n");
+       /* remove old value from k*/
+       k=0;
+       /* line 7 to 261 (254 values)*/
+       for(k=0;k<=254;k++)
+       {
+          /* write aci_table values*/
+          fprintf(writed," %d=%s\n",k,name[k]);
+       }
+       /* line 262 end of aci_table*/
+       fprintf(writed,"}\n");
     }
-    /* line 262 end of aci_table*/
-    fprintf(writed,"}\n");
     /* line 263 start of plot_style struct*/
     fprintf(writed,"plot_style{\n");
     /* remove old value from k*/
@@ -655,13 +667,15 @@ int k=0,PIA_uncompressed_line_number=0;
        /* parse ctb*/
        plot_style_parser(argv[2]);
        /* write other txt for ctb*/
-       ctb_writer();
+       plot_style_writer();
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
        /* parse stb*/
        plot_style_parser(argv[2]);
+       /* write other txt for ctb*/
+       plot_style_writer();
        fprintf(stderr, "Sorry, the .stb subclass type isn't yet debugged\n");
     }
 
