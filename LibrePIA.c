@@ -29,6 +29,7 @@ unsigned char header[37],header2[11],checksum[12],line_buffer[4900];
 unsigned int readed_decompressed_size=0, readed_compressed_size=0, readed_Adler32=0;
 int k=0,PIA_uncompressed_line_number=0;
 /*int PIA_ver=0, subclass_ver=0; unused*/
+unsigned long output_file_size, input_file_size;
 
 
  /* obtain information of version,file subclass type and sizes*/
@@ -158,7 +159,7 @@ int k=0,PIA_uncompressed_line_number=0;
        fwrite(data, 1, readed_decompressed_size-1, outfile);
 
        /* Obtain information of output file size*/
-       unsigned long output_file_size = ftell(outfile);
+       output_file_size = ftell(outfile);
 
        /* debug*/
        #if DEBUG
@@ -660,6 +661,92 @@ int k=0,PIA_uncompressed_line_number=0;
     fclose(writed);
  }
 
+ /* funtion for zip PIA file*/
+ int compress_data(char *infilename)
+ {
+    /* open compressed PIA file*/
+    FILE *infile = fopen(infilename, "rb");
+    /* create uncompressed file*/
+    gzFile outfile = gzopen("output.ctb", "wb");
+    /* verify if files exist*/
+    if (!infile || !outfile) return -1;
+
+    /* declare buffer, buffer size is the compressed size*/
+    char buffer[readed_compressed_size];
+    /* declare data, data size is equal to decompressed size without header(48byte), Adler 32 checksum(4byte), 
+    decompressed size (4byte) and compressed size(4byte), in total (60byte)*/
+    char data[readed_decompressed_size];
+    /* number of byte readed*/
+    int num_read = 0;
+
+    /* write PIA header*/
+    gzprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodecl%d%d%d", header[19], header[20], header[21], readed_Adler32, input_file_size, output_file_size+60);
+
+    /* first 48 bytes = header (not compressed, composed by "PIAFILEVERSION_2.0,???VER1,compress/r/npmzlibcodec)
+    next 4 bytes Adler32 checksum
+    next 4 bytes (unsigned int) decompressed stream size
+    next 4 bytes (unsigned int) compressed stream size*/
+    gzseek (outfile, 48+4+4+4, SEEK_CUR);
+
+    /* read input compressed data file*/
+    while ((num_read = fread(data, sizeof(char), sizeof(data), infile)) > 0)
+    {
+       /* deflate buffer into data*/
+       /* zlib struct*/
+       z_stream defstream;
+       defstream.zalloc = Z_NULL;
+       defstream.zfree = Z_NULL;
+       defstream.opaque = Z_NULL;
+
+       /* setup "buffer" as the compressed output and "data" as the decompressed input*/
+       /* size of input*/
+       defstream.avail_in = (uInt)sizeof(data);
+       /* input char array*/
+       defstream.next_in = (Bytef *)data;
+       /* size of output*/
+       defstream.avail_out = (uInt)sizeof(buffer);
+       /* output char array*/
+       defstream.next_out = (Bytef *)buffer;
+         
+       /* the real compression work*/
+       deflateInit(&defstream, Z_BEST_COMPRESSION);
+       deflate(&defstream, Z_FINISH);
+       deflateEnd(&defstream);
+
+       /* write compressed data*/
+       gzwrite(outfile, buffer, readed_compressed_size);
+
+       /* obtain information of input file size*/
+       input_file_size = ftell(infile);
+
+       /* obtain information of output file size*/
+       output_file_size = gztell(outfile);
+
+       /* debug*/
+       #if DEBUG
+       printf("writed %d compressed bytes\n", output_file_size);
+       #endif
+    }
+
+    /* close input and output file*/
+    gzclose(outfile);
+    fclose(infile);
+ }
+
+
+ /* write information of version,file subclass type and sizes*/
+ unsigned long write_header()
+ {
+    /* open compressed PIA file but without zlib*/
+    FILE *outfile = fopen("output.ctb", "wb");
+
+    /* vrite PIA header*/
+    fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodecl%d%d%d", header[19], header[20], header[21], readed_Adler32, input_file_size, output_file_size+60);
+
+    /* close input and output file*/
+    fclose(outfile);
+ }
+
  /* proof of concept for decompress PIA file in a text form,
  can be used for all PIA file (ctb, stb, pc3, pmp)*/
  int main(int argc, char **argv)
@@ -671,17 +758,22 @@ int k=0,PIA_uncompressed_line_number=0;
     {
        /* parse ctb*/
        plot_style_parser(argv[2]);
-       /* write other txt for ctb*/
+       /* here can be put a code for modify the values
+       */
+       /* rewrite txt for ctb*/
        plot_style_writer(argv[2]);
+       compress_data(argv[2]);
+       //write_header();
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
        /* parse stb*/
        plot_style_parser(argv[2]);
-       /* write other txt for ctb*/
+       /* here can be put a code for modify the values
+       */
+       /* rewrite txt for stb*/
        plot_style_writer(argv[2]);
-       fprintf(stderr, "Sorry, the .stb subclass type isn't yet debugged\n");
     }
 
     else if (header[19]=='P' && header[20]=='C' && header[21]=='3')
