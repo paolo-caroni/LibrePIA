@@ -16,6 +16,63 @@
 PMP is a file extension for a plotter model parameter file used by PC3 files.<br>
 Since PC3 depend on the <a href="HDI.html" title="Heidi® Device Interface">HDI</a> that is closed source, undocumented and compatible only under Windows S.O. I'm not very interested to understand how PC3 and PMP works.<br>
 Maybe can be useful understand how PMP works for port paper size to system printer directly, without an abstraction software level.<br>
+So, the most interesting part of the PMP file is <cite>udm{</cite> taht stands for UserDefinedMetric.<br>
+<br>
+<h3>udm{</h3>
+<p>
+Stands for User Defined Metric, the custom paper size.<br>
+This is the start of interesting part.<br>
+<br>
+<h3> calibration{</h3>
+<p>
+Calibration.<br><br>
+Default value is <cite>  _x=1.0\n  _y=1.0\n }</cite><br><br>
+<br>
+<h3> media{</h3>
+<p>
+Start of media.<br><br>
+<br>
+<h3>  size{</h3>
+<p>
+Start of size name and other info.<br><br>
+An example can be:<br>
+<cite>
+   0{<br>
+    caps_type=2<br>
+    name="UserDefinedMetric (1470.00 x 297.00mm)<br>
+    localized_name="7x1 MODULI (1470.00 x 297.00 mm)<br>
+    media_description_name="UserDefinedMetric Orizzontale 1470.00L x 297.00A - (0, 0) x (1470, 297) =436590 mm<br>
+    media_group=15<br>
+    landscape_mode=TRUE<br>
+   }<br>
+   </cite>
+<br>
+Of this imho the most interesting part is localized_name and maybe landscape_mode.<br>
+All other info can be readed from other lines.<br>
+<br>
+<h3>  description{</h3>
+<p>
+Start of descriotion size.<br><br>
+An example can be:<br>
+<cite>
+   0{<br>
+    caps_type=2<br>
+    name="UserDefinedMetric Orizzontale 1470.00L x 297.00A - (0, 0) x (1470, 297) =436590 mm<br>
+    media_bounds_urx=1470.0<br>
+    media_bounds_ury=297.0<br>
+    printable_bounds_llx=0.0<br>
+    printable_bounds_lly=0.0<br>
+    printable_bounds_urx=1470.0<br>
+    printable_bounds_ury=297.0<br>
+    printable_area=436590.00000 (     +BE&D%#\@)<br>
+    dimensional=TRUE<br>
+   }<br>
+</cite>
+<br>
+This are the dimension of the paper sizes (media_bounds_urx/y) and the printable sizes (printable_bounds_urx/y).<br>
+The printable_area value is simply printable_bounds_urx * printable_bounds_ury.<br>
+All the sizes are always expressed in mm not in "points", most printer use "point" (for example all PPD files).<br>
+1 "point" is about 0.3527 mm.<br>
 <br>
 </body>
 </html>
