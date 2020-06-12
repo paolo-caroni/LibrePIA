@@ -520,10 +520,15 @@ int k=0,PIA_uncompressed_line_number=0;
  }
 
  /* funtion for write CTB or STB uncompressed text*/
- int plot_style_writer()
+ int plot_style_writer(char *outfilename)
  {
-    /* create new uncompressed .txt file*/
+    /* open outfilename file*/
+    FILE *writed = fopen(outfilename, "wb");
+
+    #if DEBUG
+    /* create new different uncompressed .txt file*/
     FILE *writed = fopen("output.txt", "wb");
+    #endif
 
     /* Parse ctb file*/
     /* first line, description, can contain space*/
@@ -667,7 +672,7 @@ int k=0,PIA_uncompressed_line_number=0;
        /* parse ctb*/
        plot_style_parser(argv[2]);
        /* write other txt for ctb*/
-       plot_style_writer();
+       plot_style_writer(argv[2]);
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
@@ -675,7 +680,7 @@ int k=0,PIA_uncompressed_line_number=0;
        /* parse stb*/
        plot_style_parser(argv[2]);
        /* write other txt for ctb*/
-       plot_style_writer();
+       plot_style_writer(argv[2]);
        fprintf(stderr, "Sorry, the .stb subclass type isn't yet debugged\n");
     }
 
