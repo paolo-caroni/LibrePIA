@@ -679,9 +679,6 @@ unsigned long output_file_size, input_file_size;
     /* number of byte readed*/
     int num_read = 0;
 
-    /* write PIA header*/
-    gzprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodecl%d%d%d", header[19], header[20], header[21], readed_Adler32, input_file_size, output_file_size+60);
-
     /* first 48 bytes = header (not compressed, composed by "PIAFILEVERSION_2.0,???VER1,compress/r/npmzlibcodec)
     next 4 bytes Adler32 checksum
     next 4 bytes (unsigned int) decompressed stream size
@@ -716,10 +713,10 @@ unsigned long output_file_size, input_file_size;
        /* write compressed data*/
        gzwrite(outfile, buffer, readed_compressed_size);
 
-       /* obtain information of input file size*/
+       /* obtain information of input file size (uncompressed text form)*/
        input_file_size = ftell(infile);
 
-       /* obtain information of output file size*/
+       /* obtain information of output file size (compressed form)*/
        output_file_size = gztell(outfile);
 
        /* debug*/
@@ -738,10 +735,10 @@ unsigned long output_file_size, input_file_size;
  unsigned long write_header()
  {
     /* open compressed PIA file but without zlib*/
-    FILE *outfile = fopen("output.ctb", "wb");
+    FILE *outfile = fopen("output.ctb", "rb+");
 
     /* vrite PIA header*/
-    fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodecl%d%d%d", header[19], header[20], header[21], readed_Adler32, input_file_size, output_file_size+60);
+    fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodec%d%d%d", header[19], header[20], header[21], readed_Adler32, input_file_size, output_file_size+60);
 
     /* close input and output file*/
     fclose(outfile);
@@ -763,7 +760,7 @@ unsigned long output_file_size, input_file_size;
        /* rewrite txt for ctb*/
        plot_style_writer(argv[2]);
        compress_data(argv[2]);
-       //write_header();
+       write_header();
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
