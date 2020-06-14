@@ -737,8 +737,35 @@ unsigned long output_file_size, input_file_size;
     /* open compressed PIA file but without zlib*/
     FILE *outfile = fopen("output.ctb", "rb+");
 
-    /* vrite PIA header*/
-    fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodec%d%d%d", header[19], header[20], header[21], readed_Adler32, input_file_size, output_file_size+60);
+    /* write PIA header (bytes number 0 to 48)*/
+    fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodec", header[19], header[20], header[21]);
+
+    /* divide adler32 in 4 bytes*/
+    checksum[3] = (readed_Adler32 >> 24) & 0xFF;
+    checksum[2] = (readed_Adler32 >> 16) & 0xFF;
+    checksum[1] = (readed_Adler32 >> 8) & 0xFF;
+    checksum[0] = readed_Adler32 & 0xFF;
+
+    /* write adler 32 (bytes number 49-50-51-52)*/
+    fprintf(outfile,"%c%c%c%c", checksum[0], checksum[1], checksum[2], checksum[3]);
+
+    /* divide uncompressed size in 4 bytes*/
+    checksum[7] = (input_file_size >> 24) & 0xFF;
+    checksum[6] = (input_file_size >> 16) & 0xFF;
+    checksum[5] = (input_file_size >> 8) & 0xFF;
+    checksum[4] = input_file_size & 0xFF;
+
+    /* write uncompressed size (bytes number 53-54-55-56)*/
+    fprintf(outfile,"%c%c%c%c", checksum[4], checksum[5], checksum[6], checksum[7]);
+
+    /* divide compressed size in 4 bytes*/
+    checksum[11] = (output_file_size >> 24) & 0xFF;
+    checksum[10] = (output_file_size >> 16) & 0xFF;
+    checksum[9] = (output_file_size >> 8) & 0xFF;
+    checksum[8] = output_file_size & 0xFF;
+
+    /* write compressed size (bytes number 57-58-59-60)*/
+    fprintf(outfile,"%c%c%c%c", checksum[8], checksum[9], checksum[10], checksum[11]);
 
     /* close input and output file*/
     fclose(outfile);
