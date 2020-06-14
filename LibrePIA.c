@@ -671,11 +671,18 @@ unsigned long output_file_size, input_file_size;
     /* verify if files exist*/
     if (!infile || !outfile) return -1;
 
-    /* declare buffer, buffer size is the compressed size*/
+    /* move to the end of input file*/
+    fseek(infile, 0, SEEK_END);
+    /* obtain information of input file size (uncompressed text form)*/
+    input_file_size = ftell(infile);
+    /* move to the start of input file*/
+    fseek(infile, 0, SEEK_SET);
+
+    /* declare buffer, buffer size is the compressed size, actally I don't know how predict this size...
+    so I simply assumed that is similar to the readed_compressed_size. Need improvement*/
     char buffer[readed_compressed_size];
-    /* declare data, data size is equal to decompressed size without header(48byte), Adler 32 checksum(4byte), 
-    decompressed size (4byte) and compressed size(4byte), in total (60byte)*/
-    char data[readed_decompressed_size];
+    /* declare data, data size is equal to decompressed size (the size of the input txt file)*/
+    char data[input_file_size];
     /* number of byte readed*/
     int num_read = 0;
 
@@ -705,16 +712,13 @@ unsigned long output_file_size, input_file_size;
        /* output char array*/
        defstream.next_out = (Bytef *)buffer;
          
-       /* the real compression work*/
-       deflateInit(&defstream, Z_BEST_COMPRESSION);
+       /* the real compression work, this seems to be different from original deflate compression, need more investigations*/
+       deflateInit(&defstream, Z_DEFAULT_COMPRESSION);
        deflate(&defstream, Z_FINISH);
        deflateEnd(&defstream);
 
        /* write compressed data*/
-       gzwrite(outfile, buffer, readed_compressed_size);
-
-       /* obtain information of input file size (uncompressed text form)*/
-       input_file_size = ftell(infile);
+       gzwrite(outfile, buffer, sizeof(buffer));
 
        /* obtain information of output file size (compressed form)*/
        output_file_size = gztell(outfile);
