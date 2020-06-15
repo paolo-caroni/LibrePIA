@@ -27,7 +27,7 @@ int apply_factor;
 /* custom_lineweight_display_units*/
 int custom_lineweight_display_units;
 /* aci_table (only for ctb)*/
-char aci_table[256][20];
+char aci_table[255][20];
 /* plot_style*/
 int color_number[255];
 char name[255][261];
