@@ -22,14 +22,8 @@
 #include <string.h>
 #include <zlib.h>
 /* include header files*/
+#include "LibrePIA.h"
 #include "plot_style_table.h"
-
-/* declare header and info common to all PIA files*/
-unsigned char header[37],header2[11],checksum[12],line_buffer[4900];
-unsigned int readed_decompressed_size=0, readed_compressed_size=0, readed_Adler32=0;
-int k=0,PIA_uncompressed_line_number=0;
-/*int PIA_ver=0, subclass_ver=0; unused*/
-unsigned long output_file_size, input_file_size;
 
 
  /* obtain information of version,file subclass type and sizes*/
@@ -159,12 +153,12 @@ unsigned long output_file_size, input_file_size;
        fwrite(data, 1, readed_decompressed_size-1, outfile);
 
        /* Obtain information of output file size*/
-       output_file_size = ftell(outfile);
+       writed_compressed_size = ftell(outfile);
 
        /* debug*/
        #if DEBUG
        printf("readed %d compressed bytes\n", num_read);
-       printf("writed %d decompressed bytes\n", output_file_size);
+       printf("writed %d decompressed bytes\n", writed_compressed_size);
        #endif
 
        /* count number of line in uncompressed stream*/
@@ -255,7 +249,7 @@ unsigned long output_file_size, input_file_size;
 
         /* remove old value from k*/
         k=0;
-       /* only for ctb get line 7 to 261 (254 values)*/
+       /* only for ctb get line 7 to 261 (255 values)*/
        for(k=0;k<=254;k++)
        {
        /* stupid code, try new approach*/
@@ -718,15 +712,23 @@ unsigned long output_file_size, input_file_size;
        deflateEnd(&defstream);
 
        /* write compressed data*/
-       gzwrite(outfile, buffer, sizeof(buffer));
+       gzwrite(outfile, buffer, defstream.total_out);
 
-       /* obtain information of output file size (compressed form)*/
-       output_file_size = gztell(outfile);
+       /* obtain information of compressed size*/
+       /*writed_compressed_size = gztell(outfile)-60;*/
+       writed_compressed_size = defstream.total_out;
+
+       /* obtain information of decompressed size*/
+       writed_decompressed_size = defstream.total_in;
+
+       /* calculate Adler32*/
+       writed_Adler32 = adler32(0, buffer, defstream.total_out);
 
        /* debug*/
-       #if DEBUG
-       printf("writed %d compressed bytes\n", output_file_size);
-       #endif
+       //#if DEBUG
+       printf("readed %d decompressed bytes, expected %d bytes\n", writed_decompressed_size, input_file_size);
+       printf("writed %d compressed bytes\n", writed_compressed_size);
+       //#endif
     }
 
     /* close input and output file*/
@@ -745,28 +747,28 @@ unsigned long output_file_size, input_file_size;
     fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodec", header[19], header[20], header[21]);
 
     /* divide adler32 in 4 bytes*/
-    checksum[3] = (readed_Adler32 >> 24) & 0xFF;
-    checksum[2] = (readed_Adler32 >> 16) & 0xFF;
-    checksum[1] = (readed_Adler32 >> 8) & 0xFF;
-    checksum[0] = readed_Adler32 & 0xFF;
+    checksum[3] = (writed_Adler32 >> 24) & 0xFF;
+    checksum[2] = (writed_Adler32 >> 16) & 0xFF;
+    checksum[1] = (writed_Adler32 >> 8) & 0xFF;
+    checksum[0] = writed_Adler32 & 0xFF;
 
     /* write adler 32 (bytes number 49-50-51-52)*/
     fprintf(outfile,"%c%c%c%c", checksum[0], checksum[1], checksum[2], checksum[3]);
 
     /* divide uncompressed size in 4 bytes*/
-    checksum[7] = (input_file_size >> 24) & 0xFF;
-    checksum[6] = (input_file_size >> 16) & 0xFF;
-    checksum[5] = (input_file_size >> 8) & 0xFF;
-    checksum[4] = input_file_size & 0xFF;
+    checksum[7] = (writed_decompressed_size >> 24) & 0xFF;
+    checksum[6] = (writed_decompressed_size >> 16) & 0xFF;
+    checksum[5] = (writed_decompressed_size >> 8) & 0xFF;
+    checksum[4] = writed_decompressed_size & 0xFF;
 
     /* write uncompressed size (bytes number 53-54-55-56)*/
     fprintf(outfile,"%c%c%c%c", checksum[4], checksum[5], checksum[6], checksum[7]);
 
     /* divide compressed size in 4 bytes*/
-    checksum[11] = (output_file_size >> 24) & 0xFF;
-    checksum[10] = (output_file_size >> 16) & 0xFF;
-    checksum[9] = (output_file_size >> 8) & 0xFF;
-    checksum[8] = output_file_size & 0xFF;
+    checksum[11] = (writed_compressed_size >> 24) & 0xFF;
+    checksum[10] = (writed_compressed_size >> 16) & 0xFF;
+    checksum[9] = (writed_compressed_size >> 8) & 0xFF;
+    checksum[8] = writed_compressed_size & 0xFF;
 
     /* write compressed size (bytes number 57-58-59-60)*/
     fprintf(outfile,"%c%c%c%c", checksum[8], checksum[9], checksum[10], checksum[11]);
