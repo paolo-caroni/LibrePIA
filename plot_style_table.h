@@ -29,7 +29,6 @@ int custom_lineweight_display_units;
 /* aci_table (only for ctb)*/
 char aci_table[255][20];
 /* plot_style*/
-int color_number[255];
 char name[255][261];
 char localized_name[255][261];
 char description[255][4869];
@@ -52,7 +51,9 @@ int join_style[255];
 float custom_lineweight_table[27];
 
 /* other useful entities*/
-int min_style=0,max_style=254,style_number;
+int min_style=0;
+/* STB can have max_style over 254, maybe near to infinite... need improvement*/
+int max_style=254;
 /* boolean, define TRUE and FALSE
 _Bool aci_table_available;
 _Bool apply_factor;

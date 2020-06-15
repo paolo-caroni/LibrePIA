@@ -291,15 +291,8 @@
     for(k=0;k<=max_style;k++)
     {
        /* color/named plot style value color init (number)*/
-/* known bug segmentation fault
-       sscanf(line_buffer," %3[^{]",style_number[k]);
-       //#if DEBUG
-       if(k!=style_number[k])
-       {
-       printf("wrong plot style number, expected \"%d\" found \"%d\"\n", k, style_number[k]);
-       }
-       //#endif
-*/
+       /* unused, is always equal to k*/
+
        /* color/named plot style value name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        sscanf(line_buffer,"  name=%[^\n]",&name[k]);
@@ -431,10 +424,12 @@
           /* this is the end of plot_style*/
           max_style=k;
        }
-       else if (k==254 && line_buffer[0]!='}')
+       /* this is valid only for CTB*/
+       else if (header[19]=='C' && header[20]=='T' && header[21]=='B' && k==254 && line_buffer[0]!='}')
        {
           fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
        }
+       /* STB can have max_style over 254, maybe near to infinite... need improvement*/
     }
 
     /* read custom_lineweight_table*/
@@ -510,7 +505,7 @@
     {
        fprintf(stderr, "end of custom_lineweight_table ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
     }
-	/* close input file*/
+    /* close input file*/
     fclose(infile);
  }
 
@@ -714,21 +709,20 @@
        /* write compressed data*/
        gzwrite(outfile, buffer, defstream.total_out);
 
-       /* obtain information of compressed size*/
-       /*writed_compressed_size = gztell(outfile)-60;*/
-       writed_compressed_size = defstream.total_out;
-
        /* obtain information of decompressed size*/
        writed_decompressed_size = defstream.total_in;
+
+       /* obtain information of compressed size*/
+       writed_compressed_size = defstream.total_out;
 
        /* calculate Adler32*/
        writed_Adler32 = adler32(0, buffer, defstream.total_out);
 
        /* debug*/
-       //#if DEBUG
+       #if DEBUG
        printf("readed %d decompressed bytes, expected %d bytes\n", writed_decompressed_size, input_file_size);
        printf("writed %d compressed bytes\n", writed_compressed_size);
-       //#endif
+       #endif
     }
 
     /* close input and output file*/
@@ -798,6 +792,7 @@
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
+       fprintf(stderr, "Sorry, actually can be readed max 254 styles\n\n");
        /* parse stb*/
        plot_style_parser(argv[2]);
        /* here can be put a code for modify the values
