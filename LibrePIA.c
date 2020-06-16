@@ -656,12 +656,12 @@
  }
 
  /* funtion for zip PIA file*/
- int compress_data(char *infilename)
+ int compress_data(char *infilename, char *outfilename)
  {
     /* open compressed PIA file*/
     FILE *infile = fopen(infilename, "rb");
     /* create uncompressed file*/
-    gzFile outfile = gzopen("output.ctb", "wb");
+    gzFile outfile = gzopen(outfilename, "wb");
     /* verify if files exist*/
     if (!infile || !outfile) return -1;
 
@@ -737,10 +737,10 @@
 
 
  /* write information of version,file subclass type and sizes*/
- unsigned long write_header()
+ unsigned long write_header(char *inoutfilename)
  {
     /* open compressed PIA file but without zlib*/
-    FILE *outfile = fopen("output.ctb", "rb+");
+    FILE *outfile = fopen(inoutfilename, "rb+");
 
     /* write PIA header (bytes number 0 to 48)*/
     fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodec", header[19], header[20], header[21]);
@@ -791,13 +791,11 @@
        */
        /* rewrite txt for ctb*/
        plot_style_writer(argv[2]);
-       compress_data(argv[2]);
-       write_header();
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
-       fprintf(stderr, "Sorry, actually can be readed max 254 styles\n\n");
+       fprintf(stderr, "Sorry, actually can be readed max %d styles\n\n", max_style);
        /* parse stb*/
        plot_style_parser(argv[2]);
        /* here can be put a code for modify the values
@@ -821,6 +819,10 @@
     {
        fprintf(stderr, "WARNING:This isn't a known subclass type\n\n");
     }
+
+    /* compress data to other*/
+    compress_data(argv[2], argv[3]);
+    write_header(argv[3]);
  }
 
 
