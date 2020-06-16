@@ -161,10 +161,10 @@
        }
 
        /* debug*/
-       //#if DEBUG
+       #if DEBUG
        printf("readed %d compressed bytes\n", num_read);
        printf("writed %d decompressed bytes\n", ftell(outfile));
-       //#endif
+       #endif
 
        /* count number of line in uncompressed stream*/
        for(k=0;data[k];k++)
@@ -721,7 +721,7 @@
        writed_compressed_size = defstream.total_out;
 
        /* calculate Adler32*/
-       writed_Adler32 = adler32(0, buffer, defstream.total_out);
+       writed_Adler32 = adler32(0, buffer, writed_compressed_size);
 
        /* debug*/
        #if DEBUG
