@@ -136,11 +136,11 @@
 
        /* setup "buffer" as the input and "data" as the decompressed output*/
        /* size of input*/
-       infstream.avail_in = (uInt)sizeof(buffer);
+       infstream.avail_in = readed_compressed_size;
        /* input char array*/
        infstream.next_in = (Bytef *)buffer;
        /* size of output*/
-       infstream.avail_out = (uInt)sizeof(data);
+       infstream.avail_out = readed_decompressed_size;
        /* output char array*/
        infstream.next_out = (Bytef *)data;
          
@@ -149,17 +149,22 @@
        inflate(&infstream, Z_NO_FLUSH);
        inflateEnd(&infstream);
 
-       /* write uncompressed data removing last NULL byte*/
-       fwrite(data, 1, readed_decompressed_size-1, outfile);
-
-       /* Obtain information of output file size*/
-       writed_compressed_size = ftell(outfile);
+       if(data[readed_compressed_size]!='\n')
+       {
+          /* write uncompressed data removing last NULL byte*/
+          fwrite(data, 1, readed_decompressed_size-1, outfile);
+       }
+       else
+       {
+          /* write uncompressed data*/
+          fwrite(data, 1, readed_decompressed_size, outfile);
+       }
 
        /* debug*/
-       #if DEBUG
+       //#if DEBUG
        printf("readed %d compressed bytes\n", num_read);
-       printf("writed %d decompressed bytes\n", writed_compressed_size);
-       #endif
+       printf("writed %d decompressed bytes\n", ftell(outfile));
+       //#endif
 
        /* count number of line in uncompressed stream*/
        for(k=0;data[k];k++)
@@ -785,9 +790,9 @@
        /* here can be put a code for modify the values
        */
        /* rewrite txt for ctb*/
-       plot_style_writer(argv[2]);
-       compress_data(argv[2]);
-       write_header();
+       //plot_style_writer(argv[2]);
+       //compress_data(argv[2]);
+       //write_header();
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
