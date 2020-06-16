@@ -52,8 +52,8 @@ float custom_lineweight_table[27];
 
 /* other useful entities*/
 int min_style=0;
-/* STB can have max_style over 254, maybe near to infinite... need improvement*/
-int max_style=254;
+/* STB can have max_style over 255, maybe near to infinite... need improvement*/
+int max_style=255;
 /* boolean, define TRUE and FALSE
 _Bool aci_table_available;
 _Bool apply_factor;

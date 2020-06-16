@@ -125,7 +125,7 @@
     gzseek (infile, 48+4+4+4, SEEK_CUR);
 
     /* read input compressed data file*/
-    while ((num_read = gzread(infile, buffer, sizeof(buffer))) > 0)
+    while ((num_read = gzread(infile, buffer, readed_compressed_size)) > 0)
     {
        /* inflate buffer into data*/
        /* zlib struct*/
@@ -255,7 +255,7 @@
         /* remove old value from k*/
         k=0;
        /* only for ctb get line 7 to 261 (255 values)*/
-       for(k=0;k<=254;k++)
+       for(k=0;k<255;k++)
        {
        /* stupid code, try new approach*/
        fgets(aci_table[k],20,infile);
@@ -293,7 +293,7 @@
 
     /* remove old value from k*/
     k=0;
-    for(k=0;k<=max_style;k++)
+    for(k=0;k<max_style;k++)
     {
        /* color/named plot style value color init (number)*/
        /* unused, is always equal to k*/
@@ -434,7 +434,7 @@
        {
           fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
        }
-       /* STB can have max_style over 254, maybe near to infinite... need improvement*/
+       /* STB can have max_style over 255, maybe near to infinite... need improvement*/
     }
 
     /* read custom_lineweight_table*/
@@ -563,8 +563,8 @@
        fprintf(writed,"aci_table{\n");
        /* remove old value from k*/
        k=0;
-       /* line 7 to 261 (254 values)*/
-       for(k=0;k<=254;k++)
+       /* line 7 to 261 (255 values)*/
+       for(k=0;k<255;k++)
        {
           /* write aci_table values*/
           fprintf(writed," %d=%s\n",k,name[k]);
@@ -576,7 +576,7 @@
     fprintf(writed,"plot_style{\n");
     /* remove old value from k*/
     k=0;
-    for(k=0;k<=max_style;k++)
+    for(k=0;k<max_style;k++)
     {
        /* color plot style value color init (number)*/
        fprintf(writed," %d{\n",k);
