@@ -687,7 +687,7 @@
     gzseek (outfile, 48+4+4+4, SEEK_CUR);
 
     /* read input compressed data file*/
-    while ((num_read = fread(data, sizeof(char), sizeof(data), infile)) > 0)
+    while ((num_read = fread(data, sizeof(char), input_file_size, infile)) > 0)
     {
        /* deflate buffer into data*/
        /* zlib struct*/
@@ -697,8 +697,8 @@
        defstream.opaque = Z_NULL;
 
        /* setup "buffer" as the compressed output and "data" as the decompressed input*/
-       /* size of input*/
-       defstream.avail_in = (uInt)sizeof(data);
+       /* size of input plus terminator*/
+       defstream.avail_in = input_file_size+1;
        /* input char array*/
        defstream.next_in = (Bytef *)data;
        /* size of output*/
@@ -790,9 +790,9 @@
        /* here can be put a code for modify the values
        */
        /* rewrite txt for ctb*/
-       //plot_style_writer(argv[2]);
-       //compress_data(argv[2]);
-       //write_header();
+       plot_style_writer(argv[2]);
+       compress_data(argv[2]);
+       write_header();
     }
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
