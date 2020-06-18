@@ -965,6 +965,63 @@
     custom_lineweight_table[26]=2.11;
  }
 
+ /* funtion for add a plot style on STB*/
+ int add_plot_style_stb()
+ {
+    /* verify if can added a plot style on STB, this is needed because of a bug, need improvement*/
+    if(total_style_number<max_style)
+    {
+       /* set k to actual_total_style*/
+       k=total_style_number;
+       /* increase plot_style_number (add a plot style)*/
+       total_style_number++;
+       /* increase readed_compressed_size, need improvement*/
+       readed_compressed_size++;
+
+       /* named plot style value name*/
+       sprintf( name[k], "\"Style_%d", k);
+       /* named plot style value localized_name*/
+       sprintf( localized_name[k], "\"Style %d",k);
+       /* named plot style value description*/
+       sprintf( description[k], "\"");
+       /* named plot style value color*/
+       color[k]=-1;
+       /* Verify if mode_color exist on precedent plot style*/
+       if (mode_color[k-1]!='\0')
+       {
+          /* named plot style value mode_color exist, set to color*/
+          mode_color[k]=color[k];
+       }
+       /* named plot style value color_policy*/
+       color_policy[k]=1;
+       /* named plot style value physical_pen_number*/
+       physical_pen_number[k]=0;
+       /* named plot style value virtual_pen_number*/
+       virtual_pen_number[k]=0;
+       /* named plot style value screen*/
+       screen[k]=100;
+       /* named plot style value linepattern_size*/
+       linepattern_size[k]=0.5;
+       /* named plot style value linetype*/
+       linetype[k]=31;
+       /* named plot style value adaptive_linetype (TRUE or FALSE)*/
+       adaptive_linetype[k]=84;
+       /* named plot style value lineweight*/
+       lineweight[k]=0;
+       /* named plot style value fill_style*/
+       fill_style[k]=73;
+       /* named plot style value end_style*/
+       end_style[k]=4;
+       /* named plot style value join_style*/
+       join_style[k]=5;
+    }
+    /* if can't added a plot style on STB*/
+    else
+    {
+       fprintf(stderr,"actually isn't possible to have an STB with more of %s plot styles, this is my fault, sorry...", max_style);
+    }
+
+ }
 
 
  /* proof of concept for decompress PIA file in a text form,
@@ -991,6 +1048,7 @@
        plot_style_parser(argv[2]);
        /* here can be put a code for modify the values
        */
+add_plot_style_stb();
        /* rewrite txt for stb*/
        plot_style_writer(argv[2]);
     }
