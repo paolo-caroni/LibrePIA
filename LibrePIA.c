@@ -976,7 +976,7 @@
        /* increase plot_style_number (add a plot style)*/
        total_style_number++;
        /* increase readed_compressed_size, need improvement*/
-       readed_compressed_size++;
+       readed_compressed_size=382+total_style_number*14;
        /* named plot style value name*/
        sprintf( name[k], "\"Style_%d", k);
        /* named plot style value localized_name*/
@@ -1042,9 +1042,9 @@
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
-       fprintf(stderr, "Sorry, actually can be readed max %d styles\n\n", max_style);
        /* parse stb*/
        plot_style_parser(argv[2]);
+       fprintf(stderr, "Sorry, actually can be readed, writed or edited max %d styles, your file have %d styles.\n\n", max_style, total_style_number);
        /* here can be put a code for modify the values
        */
        /* rewrite txt for stb*/
