@@ -51,7 +51,8 @@ int join_style[255];
 float custom_lineweight_table[27];
 
 /* other useful entities*/
-int min_style=0;
+/* number of stile (on CTB=255, on STB can be infinite)*/
+int total_style_number=255;
 /* STB can have max_style over 255, maybe near to infinite... need improvement*/
 int max_style=255;
 /* boolean, define TRUE and FALSE

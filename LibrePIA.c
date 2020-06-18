@@ -166,6 +166,8 @@
        printf("writed %d decompressed bytes\n", ftell(outfile));
        #endif
 
+       /* remove old value from k*/
+       k=0;
        /* count number of line in uncompressed stream*/
        for(k=0;data[k];k++)
        {
@@ -293,7 +295,7 @@
 
     /* remove old value from k*/
     k=0;
-    for(k=0;k<max_style;k++)
+    for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value color init (number)*/
        /* unused, is always equal to k*/
@@ -427,7 +429,7 @@
        if (line_buffer[0]=='}')
        {
           /* this is the end of plot_style*/
-          max_style=k;
+          total_style_number=k+1;
        }
        /* this is valid only for CTB*/
        else if (header[19]=='C' && header[20]=='T' && header[21]=='B' && k==254 && line_buffer[0]!='}')
@@ -525,7 +527,7 @@
     FILE *writed = fopen("output.txt", "wb");
     #endif
 
-    /* Parse ctb file*/
+    /* Parse ctb or stb file*/
     /* first line, description, can contain space*/
     fprintf(writed,"description=%s\n",file_description);
     /* second line, aci_table_available, always TRUE for ctb*/
@@ -576,37 +578,37 @@
     fprintf(writed,"plot_style{\n");
     /* remove old value from k*/
     k=0;
-    for(k=0;k<max_style;k++)
+    for(k=0;k<total_style_number;k++)
     {
-       /* color plot style value color init (number)*/
+       /* color/named plot style value color init (number)*/
        fprintf(writed," %d{\n",k);
-       /* color plot style value name*/
+       /* color/named plot style value name*/
        fprintf(writed,"  name=%s\n",name[k]);
-       /* color plot style value localized_name*/
+       /* color/named plot style value localized_name*/
        fprintf(writed,"  localized_name=%s\n",localized_name[k]);
-       /* color plot style value description*/
+       /* color/named plot style value description*/
        fprintf(writed,"  description=%s\n",description[k]);
-       /* color plot style value color*/
+       /* color/named plot style value color*/
        fprintf(writed,"  color=%d\n",color[k]);
        /* Verify if mode_color exist*/
        if (mode_color[k]!='\0')
        {
-          /* color plot style value mode_color*/
+          /* color/named plot style value mode_color*/
           fprintf(writed,"  mode_color=%d\n",mode_color[k]);
        }
-       /* color plot style value color_policy*/
+       /* color/named plot style value color_policy*/
        fprintf(writed,"  color_policy=%d\n",color_policy[k]);
-       /* color plot style value physical_pen_number*/
+       /* color/named plot style value physical_pen_number*/
        fprintf(writed,"  physical_pen_number=%d\n",physical_pen_number[k]);
-       /* color plot style value virtual_pen_number*/
+       /* color/named plot style value virtual_pen_number*/
        fprintf(writed,"  virtual_pen_number=%d\n",virtual_pen_number[k]);
-       /* color plot style value screen*/
+       /* color/named plot style value screen*/
        fprintf(writed,"  screen=%d\n",screen[k]);
-       /* color plot style value linepattern_size*/
+       /* color/named plot style value linepattern_size*/
        fprintf(writed,"  linepattern_size=%1.1f\n",linepattern_size[k]);
-       /* color plot style value linetype*/
+       /* color/named plot style value linetype*/
        fprintf(writed,"  linetype=%d\n",linetype[k]);
-       /* color plot style value adaptive_linetype (TRUE or FALSE)*/
+       /* color/named plot style value adaptive_linetype (TRUE or FALSE)*/
        if (adaptive_linetype[k]==84)
        {
        fprintf(writed,"  adaptive_linetype=TRUE\n");
@@ -620,15 +622,15 @@
        {
        fprintf(writed,"  adaptive_linetype=TRUE\n");
        }
-       /* color plot style value lineweight*/
+       /* color/named plot style value lineweight*/
        fprintf(writed,"  lineweight=%d\n",lineweight[k]);
-       /* color plot style value fill_style*/
+       /* color/named plot style value fill_style*/
        fprintf(writed,"  fill_style=%d\n",fill_style[k]);
-       /* color plot style value end_style*/
+       /* color/named plot style value end_style*/
        fprintf(writed,"  end_style=%d\n",end_style[k]);
-       /* color plot style value join_style*/
+       /* color/named plot style value join_style*/
        fprintf(writed,"  join_style=%d\n",join_style[k]);
-       /* color plot style value end of color }*/
+       /* color/named plot style value end of color }*/
        fprintf(writed," }\n");
     }
     /* write the end of plot_style*/
@@ -712,7 +714,7 @@
        writed_compressed_size = defstream.total_out;
 
        /* calculate Adler32*/
-       writed_Adler32 = adler32(0, buffer, writed_compressed_size);
+       writed_Adler32 = adler32(0, data, input_file_size);
 	   
        /* first 48 bytes = header (not compressed, composed by "PIAFILEVERSION_2.0,???VER1,compress/r/npmzlibcodec)
        next 4 bytes Adler32 checksum
