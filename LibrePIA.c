@@ -765,17 +765,107 @@
     fclose(infile);
  }
 
+ /* funtion for create a new default CTB*/
+ int new_ctb()
+ {
+    /* declare ctb file*/
+    header[19]='C';
+    header[20]='T';
+    header[21]='B';
+    readed_compressed_size=4046;
+    /* set total_style_number to 255 (in CTB are always 255)*/
+    total_style_number=255;
+    /* first line, description, can contain space*/
+    sprintf( file_description, "\"");
+    /* second line, aci_table_available, always TRUE for ctb*/
+    aci_table_available=84;
+    /* third line, scale_factor*/
+    scale_factor=1.0;
+    /* fourth line, apply factor*/
+    apply_factor=70;
+    /* fifth line, custom_lineweight_display_units*/
+    custom_lineweight_display_units=0;
+    /* line 263 start of plot_style struct*/
+    /* remove old value from k*/
+    k=0;
+    /* loop for declare all colours*/
+    for(k=0; k<total_style_number; k++)
+    {
+       /* color plot style value name*/
+       sprintf( name[k], "\"Color_%d", k+1);
+       /* color plot style value localized_name*/
+       sprintf(localized_name[k], "\"Color_%d", k+1);
+       /* color plot style value description*/
+       sprintf( description[k], "\"");
+       /* color plot style value color*/
+       color[k]=-1;
+       /* color plot style mode_color for default dosn't exist*/
+       /* color plot style value color_policy*/
+       color_policy[k]=1;
+       /* color plot style value physical_pen_number*/
+       physical_pen_number[k]=0;
+       /* color plot style value virtual_pen_number*/
+       virtual_pen_number[k]=0;
+       /* color plot style value screen*/
+       screen[k]=100;
+       /* color plot style value linepattern_size*/
+       linepattern_size[k]=0.5;
+       /* color plot style value linetype*/
+       linetype[k]=31;
+       /* color plot style value adaptive_linetype (TRUE or FALSE)*/
+       adaptive_linetype[k]=84;
+       /* color plot style value lineweight*/
+       lineweight[k]=0;
+       /* color plot style value fill_style*/
+       fill_style[k]=73;
+       /* color plot style value end_style*/
+       end_style[k]=4;
+       /* color plot style value join_style*/
+       join_style[k]=5;
+    }
+    /* values for custom_lineweight_table*/
+    custom_lineweight_table[0]=0.0;
+    custom_lineweight_table[1]=0.05;
+    custom_lineweight_table[2]=0.09;
+    custom_lineweight_table[3]=0.1;
+    custom_lineweight_table[4]=0.13;
+    custom_lineweight_table[5]=0.15;
+    custom_lineweight_table[6]=0.18;
+    custom_lineweight_table[7]=0.2;
+    custom_lineweight_table[8]=0.25;
+    custom_lineweight_table[9]=0.3;
+    custom_lineweight_table[10]=0.35;
+    custom_lineweight_table[11]=0.4;
+    custom_lineweight_table[12]=0.45;
+    custom_lineweight_table[13]=0.5;
+    custom_lineweight_table[14]=0.53;
+    custom_lineweight_table[15]=0.6;
+    custom_lineweight_table[16]=0.65;
+    custom_lineweight_table[17]=0.7;
+    custom_lineweight_table[18]=0.8;
+    custom_lineweight_table[19]=0.9;
+    custom_lineweight_table[20]=1.0;
+    custom_lineweight_table[21]=1.06;
+    custom_lineweight_table[22]=1.2;
+    custom_lineweight_table[23]=1.4;
+    custom_lineweight_table[24]=1.58;
+    custom_lineweight_table[25]=2.0;
+    custom_lineweight_table[26]=2.11;
+ }
+
+
  /* proof of concept for decompress PIA file in a text form,
  can be used for all PIA file (ctb, stb, pc3, pmp)*/
  int main(int argc, char **argv)
  {
     read_header(argv[1]);
     decompress_data(argv[1],argv[2]);
+    //new_ctb();
     /* verify subclass type*/
     if (header[19]=='C' && header[20]=='T' && header[21]=='B')
     {
        /* parse ctb*/
-       plot_style_parser(argv[2]);
+       //plot_style_parser(argv[2]);
        /* here can be put a code for modify the values
        */
        /* rewrite txt for ctb*/
