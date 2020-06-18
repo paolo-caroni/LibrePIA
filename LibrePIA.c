@@ -977,7 +977,6 @@
        total_style_number++;
        /* increase readed_compressed_size, need improvement*/
        readed_compressed_size++;
-
        /* named plot style value name*/
        sprintf( name[k], "\"Style_%d", k);
        /* named plot style value localized_name*/
@@ -1048,7 +1047,6 @@
        plot_style_parser(argv[2]);
        /* here can be put a code for modify the values
        */
-add_plot_style_stb();
        /* rewrite txt for stb*/
        plot_style_writer(argv[2]);
     }
