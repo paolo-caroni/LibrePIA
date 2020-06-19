@@ -56,11 +56,15 @@
     else if (header[19]=='P' && header[20]=='C' && header[21]=='3')
     {
        fprintf(stderr, "Sorry, the .pc3 subclass type isn't yet supported.\nMaybe .pc3 would be never supported since is correlated to .hdi file.\n\n");
+       fprintf(stderr, "Since automated modification isn't supported, you have to modify manually your file \"%s\" then tape any key to save the output.", argv[2]);
+       getchar();
     }
 
     else if (header[19]=='P' && header[20]=='M' && header[21]=='P')
     {
        fprintf(stderr, "Sorry, the .pmp subclass type isn't yet supported.\nThe support of .pmp. isn't a priority.\n\n");
+       fprintf(stderr, "Since automated modification isn't supported, you have to modify manually your file \"%s\" then tape any key to save the output.", argv[2]);
+       getchar();
     }
 
     /* if in the header there is something wrong*/
