@@ -32,4 +32,5 @@ int PIA_uncompressed_line_number=0;
 
 /* buffer and utility*/
 int k=0;
+int position;
 unsigned char line_buffer[4900];
