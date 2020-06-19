@@ -20,7 +20,7 @@
 #define MAX_STYLE 510
 
 /* initial value of number of stile (on CTB=255, on STB can be infinite)*/
-int total_style_number=1;
+int total_style_number;
 /* boolean, define TRUE and FALSE
 _Bool aci_table_available;
 _Bool apply_factor;

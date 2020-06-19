@@ -20,17 +20,31 @@
 /* directly readed*/
 unsigned char header[37],header2[11],checksum[12];
 /* obtained by program*/
-unsigned int readed_decompressed_size=0, readed_compressed_size=0, readed_Adler32=0;
-unsigned int writed_decompressed_size=0, writed_compressed_size=0, writed_Adler32=0;
-unsigned int input_file_size=0;
+unsigned int readed_decompressed_size, readed_compressed_size, readed_Adler32;
+unsigned int writed_decompressed_size, writed_compressed_size, writed_Adler32;
+unsigned int input_file_size;
 /* unused header variable*/
 /*int PIA_ver=0, subclass_ver=0;*/
 
 /* other info*/
 /* number of line on uncompressed txt file*/
-int PIA_uncompressed_line_number=0;
+int PIA_uncompressed_line_number;
 
 /* buffer and utility*/
-int k=0;
+int k;
 int position;
 unsigned char line_buffer[4900];
+
+/* declare function*/
+int read_header(char *);
+int decompress_data(char *, char *);
+int plot_style_parser(char *);
+int plot_style_writer(char *);
+int write_PIA(char *, char *);
+int new_ctb();
+int new_stb();
+int add_plot_style_stb();
+int remove_plot_style_stb();
+
+
+

@@ -27,7 +27,7 @@
 
 
  /* obtain information of version,file subclass type and sizes*/
- unsigned long read_header(char *infilename)
+ int read_header(char *infilename)
  {
     /* open compressed PIA file but without zlib*/
     FILE *infile=fopen(infilename, "rb");
@@ -295,6 +295,8 @@
 
     /* remove old value from k*/
     k=0;
+    /* remove old value from total_style_number*/
+    total_style_number=1;
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value color init (number)*/
@@ -1096,56 +1098,4 @@
        fprintf(stderr,"the file isn't an STB, plot style can't be removed on CTB");
     }
  }
-
-
-
-
- /* proof of concept for decompress PIA file in a text form,
- can be used for all PIA file (ctb, stb, pc3, pmp)*/
- int main(int argc, char **argv)
- {
-    read_header(argv[1]);
-    decompress_data(argv[1],argv[2]);
-    /* verify subclass type*/
-    if (header[19]=='C' && header[20]=='T' && header[21]=='B')
-    {
-       /* parse ctb*/
-       plot_style_parser(argv[2]);
-       /* here can be put a code for modify the values
-       */
-       /* rewrite txt for ctb*/
-       plot_style_writer(argv[2]);
-    }
-
-    else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
-    {
-       /* parse stb*/
-       plot_style_parser(argv[2]);
-       fprintf(stderr, "Sorry, actually can be readed, writed or edited max %d styles, your file have %d styles.\n\n", MAX_STYLE, total_style_number);
-       /* here can be put a code for modify the values
-       */
-       /* rewrite txt for stb*/
-       plot_style_writer(argv[2]);
-    }
-
-    else if (header[19]=='P' && header[20]=='C' && header[21]=='3')
-    {
-       fprintf(stderr, "Sorry, the .pc3 subclass type isn't yet supported.\nMaybe .pc3 would be never supported since is correlated to .hdi file.\n\n");
-    }
-
-    else if (header[19]=='P' && header[20]=='M' && header[21]=='P')
-    {
-       fprintf(stderr, "Sorry, the .pmp subclass type isn't yet supported.\nThe support of .pmp. isn't a priority.\n\n");
-    }
-
-    /* if in the header there is something wrong*/
-    else
-    {
-       fprintf(stderr, "WARNING:This isn't a known subclass type\n\n");
-    }
-
-    /* compress data to other*/
-    write_PIA(argv[2], argv[3]);
- }
-
 
