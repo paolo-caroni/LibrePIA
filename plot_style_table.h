@@ -16,6 +16,19 @@
 
 /* declare ctb and stb int, float, string, matrix, etc*/
 
+/* STB can have max_style over this value, maybe near to infinite... need improvement*/
+#define MAX_STYLE 510
+
+/* initial value of number of stile (on CTB=255, on STB can be infinite)*/
+int total_style_number=1;
+/* boolean, define TRUE and FALSE
+_Bool aci_table_available;
+_Bool apply_factor;
+_Bool adaptive_linetype[MAX_STYLE];
+const int TRUE = 1;
+const int FALSE = 0;
+*/
+
 /* description of the file*/
 char file_description[1027];
 /* aci_table_available better using boolean? or char?*/
@@ -29,36 +42,23 @@ int custom_lineweight_display_units;
 /* aci_table (only for ctb)*/
 char aci_table[255][20];
 /* plot_style*/
-char name[255][261];
-char localized_name[255][261];
-char description[255][4869];
-int color[255];
+char name[MAX_STYLE][261];
+char localized_name[MAX_STYLE][261];
+char description[MAX_STYLE][4869];
+int color[MAX_STYLE];
 /* mode_color is optional*/
-int mode_color[255];
-int color_policy[255];
-int physical_pen_number[255];
-int virtual_pen_number[255];
-int screen[255];
-float linepattern_size[255];
-int linetype[255];
+int mode_color[MAX_STYLE];
+int color_policy[MAX_STYLE];
+int physical_pen_number[MAX_STYLE];
+int virtual_pen_number[MAX_STYLE];
+int screen[MAX_STYLE];
+float linepattern_size[MAX_STYLE];
+int linetype[MAX_STYLE];
 /* adaptive_linetype better using boolean? or char?*/
-int adaptive_linetype[255];
-int lineweight[255];
-int fill_style[255];
-int end_style[255];
-int join_style[255];
+int adaptive_linetype[MAX_STYLE];
+int lineweight[MAX_STYLE];
+int fill_style[MAX_STYLE];
+int end_style[MAX_STYLE];
+int join_style[MAX_STYLE];
 /* custom_lineweight_table*/
 float custom_lineweight_table[27];
-
-/* other useful entities*/
-/* number of stile (on CTB=255, on STB can be infinite)*/
-int total_style_number=255;
-/* STB can have max_style over 255, maybe near to infinite... need improvement*/
-int max_style=255;
-/* boolean, define TRUE and FALSE
-_Bool aci_table_available;
-_Bool apply_factor;
-_Bool adaptive_linetype[255];
-const int TRUE = 1;
-const int FALSE = 0;
-*/

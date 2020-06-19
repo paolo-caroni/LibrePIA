@@ -425,18 +425,29 @@
        }
        /* read the end of plot_style or the next color/named plot style value color init (number)*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       /* on stb the plot_style number is variable, so it's better to verify the max_style number*/
+       /* on stb the plot_style number is variable, so it's better to verify the MAX_STYLE number*/
        if (line_buffer[0]=='}')
        {
           /* this is the end of plot_style*/
           total_style_number=k+1;
        }
+       /* this is valid only for STB*/
+       else if (line_buffer[0]!='}' && header[19]=='S' && header[20]=='T' && header[21]=='B' && total_style_number<MAX_STYLE)
+       {
+          /* there is another plot style*/
+          total_style_number++;
+       }
        /* this is valid only for CTB*/
+       else if (line_buffer[0]!='}' && header[19]=='C' && header[20]=='T' && header[21]=='B' && total_style_number<255)
+       {
+          /* there is another plot style*/
+          total_style_number++;
+       }
+       /* verify correct end for CTB*/
        else if (header[19]=='C' && header[20]=='T' && header[21]=='B' && k==254 && line_buffer[0]!='}')
        {
           fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
        }
-       /* STB can have max_style over 255, maybe near to infinite... need improvement*/
     }
 
     /* read custom_lineweight_table*/
@@ -969,7 +980,7 @@
  int add_plot_style_stb()
  {
     /* verify if can added a plot style on STB, this is needed because of a bug, need improvement*/
-    if(total_style_number<max_style)
+    if(total_style_number<MAX_STYLE)
     {
        /* set k to actual_total_style*/
        k=total_style_number;
@@ -1017,7 +1028,7 @@
     /* if can't added a plot style on STB*/
     else
     {
-       fprintf(stderr,"actually isn't possible to have an STB with more of %s plot styles, this is my fault, sorry...", max_style);
+       fprintf(stderr,"actually isn't possible to have an STB with more of %s plot styles, this is my fault, sorry...", MAX_STYLE);
     }
 
  }
@@ -1044,7 +1055,7 @@
     {
        /* parse stb*/
        plot_style_parser(argv[2]);
-       fprintf(stderr, "Sorry, actually can be readed, writed or edited max %d styles, your file have %d styles.\n\n", max_style, total_style_number);
+       fprintf(stderr, "Sorry, actually can be readed, writed or edited max %d styles, your file have %d styles.\n\n", MAX_STYLE, total_style_number);
        /* here can be put a code for modify the values
        */
        /* rewrite txt for stb*/
