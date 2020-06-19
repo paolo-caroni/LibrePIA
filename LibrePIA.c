@@ -30,7 +30,7 @@
  unsigned long read_header(char *infilename)
  {
     /* open compressed PIA file but without zlib*/
-    FILE *infile = fopen(infilename, "rb");
+    FILE *infile=fopen(infilename, "rb");
 
     /* READ header and other info*/
     fread(header, 1, sizeof(header), infile);
@@ -533,11 +533,6 @@
     /* open outfilename file*/
     FILE *writed = fopen(outfilename, "wb");
 
-    #if DEBUG
-    /* create new different uncompressed .txt file*/
-    FILE *writed = fopen("output.txt", "wb");
-    #endif
-
     /* Parse ctb or stb file*/
     /* first line, description, can contain space*/
     fprintf(writed,"description=%s\n",file_description);
@@ -1032,6 +1027,77 @@
     }
 
  }
+
+
+ /* funtion for remove a plot style on STB*/
+ int remove_plot_style_stb()
+ {
+    /* verify if is an STB*/
+    if(header[19]=='S' && header[20]=='T' && header[21]=='B')
+    {
+       /* Input element position to delete */
+       printf("Plot style position minimum \"1\", maximum \"%d\".\n", total_style_number);
+       printf("Enter the plot style position number to delete : ");
+       scanf("%d", &position);
+
+
+       /* Invalid delete position */
+       if(position <= 0 || position > total_style_number)
+       {
+           fprintf(stderr,"Invalid number! Please enter position between 1 to %d.\n", total_style_number);
+       }
+       else
+       {
+           /* copy next plot style value to current value*/
+           for(k=position-1; k<total_style_number-1; k++)
+           {
+               /* named plot style value name*/
+               name[k]==name[k+1];
+               /* named plot style value localized_name*/
+               localized_name[k]==localized_name[k+1];
+               /* named plot style value description*/
+               description[k]==description[k+1];
+               /* named plot style value color*/
+               color[k]=color[k+1];
+               /* named plot style mode_color if exist*/
+               if (mode_color[k]!='\0')
+               {
+                  mode_color[k]=mode_color[k+1];
+               }
+               /* named plot style value color_policy*/
+               color_policy[k]=color_policy[k+1];
+               /* named plot style value physical_pen_number*/
+               physical_pen_number[k]=physical_pen_number[k+1];
+               /* named plot style value virtual_pen_number*/
+               virtual_pen_number[k]=virtual_pen_number[k+1];
+               /* named plot style value screen*/
+               screen[k]= screen[k+1];
+               /* named plot style value linepattern_size*/
+               linepattern_size[k]=linepattern_size[k+1];
+               /* named plot style value linetype*/
+               linetype[k]=linetype[k+1];
+               /* named plot style value adaptive_linetype*/
+               adaptive_linetype[k]=adaptive_linetype[k+1];
+               /* named plot style value lineweight*/
+               lineweight[k]=lineweight[k+1];
+               /* named plot style value fill_style*/
+               fill_style[k]=fill_style[k+1];
+               /* named plot style value end_style*/
+               end_style[k]=end_style[k+1];
+               /* named plot style value join_style*/
+               join_style[k]=join_style[k+1];
+           }
+           /* delte last array number (the value will be "lost" on next plot_style_writer function call)*/
+           total_style_number--;
+       }
+    }
+    else
+    {
+       fprintf(stderr,"the file isn't an STB, plot style can't be removed on CTB");
+    }
+ }
+
+
 
 
  /* proof of concept for decompress PIA file in a text form,
