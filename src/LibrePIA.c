@@ -254,8 +254,8 @@
        #endif
        }
 
-        /* remove old value from k*/
-        k=0;
+       /* remove old value from k*/
+       k=0;
        /* only for ctb get line 7 to 261 (255 values)*/
        for(k=0;k<255;k++)
        {
