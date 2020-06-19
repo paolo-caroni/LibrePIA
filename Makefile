@@ -1,8 +1,8 @@
 CC=gcc
 
 LibrePIA:
-	$(CC) -lz -o LibrePIA LibrePIA.c
-	$(CC) -lz -D DEBUG -o LibrePIA-debug LibrePIA.c
+	$(CC) -lz -o LibrePIA src/LibrePIA.c
+	$(CC) -lz -D DEBUG -o LibrePIA-debug src/LibrePIA.c
 
 .PHONY: clean
 clean:
