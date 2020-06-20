@@ -149,7 +149,7 @@
        inflate(&infstream, Z_NO_FLUSH);
        inflateEnd(&infstream);
 
-       if(data[compressed_size]!='\n')
+       if(data[decompressed_size-1]!='\n')
        {
           /* write uncompressed data removing last NULL byte*/
           fwrite(data, 1, decompressed_size-1, outfile);
