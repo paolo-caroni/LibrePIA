@@ -683,8 +683,8 @@
     fseek(infile, 0, SEEK_SET);
 
     /* declare buffer, buffer size is the compressed size, actally I don't know how predict this size...
-    so I simply assumed that is similar to the readed_compressed_size. Need improvement*/
-    char buffer[readed_compressed_size];
+    so I simply assumed that is smaller than the input_file_size*/
+    char buffer[input_file_size/2];
     /* declare data, data size is equal to decompressed size (the size of the input txt file)*/
     char data[input_file_size];
     /* number of byte readed*/
@@ -780,7 +780,6 @@
     header[19]='C';
     header[20]='T';
     header[21]='B';
-    readed_compressed_size=4046;
     /* set total_style_number to 255 (in CTB are always 255)*/
     total_style_number=255;
     /* first line, description, can contain space*/
@@ -868,7 +867,6 @@
     header[19]='S';
     header[20]='T';
     header[21]='B';
-    readed_compressed_size=382;
     /* declare number of plot styles*/
     total_style_number=2;
     /* first line, description, can contain space*/
@@ -983,8 +981,6 @@
        k=total_style_number;
        /* increase plot_style_number (add a plot style)*/
        total_style_number++;
-       /* increase readed_compressed_size, need improvement*/
-       readed_compressed_size=382+total_style_number*14;
        /* named plot style value name*/
        sprintf( name[k], "\"Style_%d", k);
        /* named plot style value localized_name*/
