@@ -161,6 +161,12 @@
        }
 
        /* debug*/
+       if(Adler32 != adler32(1, buffer, compressed_size))
+       {
+          /* write uncompressed data removing last NULL byte*/
+          fprintf(stderr,"WARNING Adler32 checksum ERROR\n");
+          fprintf(stderr,"expected \"%d\" obtained \"%d\" instead.\n", Adler32, adler32(1, buffer, compressed_size));
+       }
        #if DEBUG
        printf("readed %d compressed bytes\n", num_read);
        printf("writed %d decompressed bytes\n", ftell(outfile));
@@ -722,7 +728,7 @@
        compressed_size = defstream.total_out;
 
        /* calculate Adler32*/
-       Adler32 = adler32(0, data, input_file_size);
+       Adler32 = adler32(1, buffer, compressed_size);
 	   
        /* first 48 bytes = header (not compressed, composed by "PIAFILEVERSION_2.0,???VER1,compress/r/npmzlibcodec)
        next 4 bytes Adler32 checksum
