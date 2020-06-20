@@ -9,15 +9,14 @@ Done:
 -function for create new ctb with deafult values;
 -function for add new plot_style on a stb;
 -function for remove a specific plot_style on a stb;
+-removed main to LibrePIA.c and create multiple example progam compiled with makefile;
 
 ToDo (difficulty is from my point of view):
--remove main to LibrePIA.c and create multiple example progam compiled with makefile (easy);
 -improve method to predetermine compressed size (medium);
 -correct writing compressed PIA file (very difficult);
 -add adler32 checksum verification on decompress_data function (medium);
 -add basic function for modify plot_style data with program and not with editor (medium);
 -add function for modify color, write ACI list (easy/medium);
--add better explanation on pc3 and pmp (easy);
 -correct bug on stb with more plot_style number... study malloc (very difficult);
 -add doxygen or other documentation (difficult);
 -add a gtk program for modify plot_style (maybe can be a different project, very difficult/near to impossible).
