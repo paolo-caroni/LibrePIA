@@ -20,8 +20,7 @@
 /* directly readed*/
 unsigned char header[37],header2[11],checksum[12];
 /* obtained by program*/
-unsigned int readed_decompressed_size, readed_compressed_size, readed_Adler32;
-unsigned int writed_decompressed_size, writed_compressed_size, writed_Adler32;
+unsigned int decompressed_size, compressed_size, Adler32;
 unsigned int input_file_size;
 /* unused header variable*/
 /*int PIA_ver=0, subclass_ver=0;*/

@@ -71,28 +71,28 @@
     fprintf(stderr, "WARNING:unsupported sub-class version\n\n");
     }
 
-    /* readed_Adler32 set to the combination of the number 49-50-51-52 bytes*/
-    readed_Adler32 = (readed_Adler32 << 8) + checksum[3];
-    readed_Adler32 = (readed_Adler32 << 8) + checksum[2];
-    readed_Adler32 = (readed_Adler32 << 8) + checksum[1];
-    readed_Adler32 = (readed_Adler32 << 8) + checksum[0];
+    /* Adler32 set to the combination of the number 49-50-51-52 bytes*/
+    Adler32 = (Adler32 << 8) + checksum[3];
+    Adler32 = (Adler32 << 8) + checksum[2];
+    Adler32 = (Adler32 << 8) + checksum[1];
+    Adler32 = (Adler32 << 8) + checksum[0];
 
-    /* readed_decompressed_size set to the combination of the number 53-54-55-56 bytes*/
-    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[7];
-    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[6];
-    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[5];
-    readed_decompressed_size = (readed_decompressed_size << 8) + checksum[4];
+    /* decompressed_size set to the combination of the number 53-54-55-56 bytes*/
+    decompressed_size = (decompressed_size << 8) + checksum[7];
+    decompressed_size = (decompressed_size << 8) + checksum[6];
+    decompressed_size = (decompressed_size << 8) + checksum[5];
+    decompressed_size = (decompressed_size << 8) + checksum[4];
 
-    /* readed_compressed_size set to the combination of the number 57-58-59-60 bytes*/
-    readed_compressed_size = (readed_compressed_size << 8) + checksum[11];
-    readed_compressed_size = (readed_compressed_size << 8) + checksum[10];
-    readed_compressed_size = (readed_compressed_size << 8) + checksum[9];
-    readed_compressed_size = (readed_compressed_size << 8) + checksum[8];
+    /* compressed_size set to the combination of the number 57-58-59-60 bytes*/
+    compressed_size = (compressed_size << 8) + checksum[11];
+    compressed_size = (compressed_size << 8) + checksum[10];
+    compressed_size = (compressed_size << 8) + checksum[9];
+    compressed_size = (compressed_size << 8) + checksum[8];
 
     /* debug function*/
     #if DEBUG
-    printf("expected compressed size: %d\n", readed_compressed_size);
-    printf("expected decompressed size: %d\n", readed_decompressed_size);
+    printf("expected compressed size: %d\n", compressed_size);
+    printf("expected decompressed size: %d\n", decompressed_size);
     #endif
 
     /* close input and output file*/
@@ -111,10 +111,10 @@
     if (!infile || !outfile) return -1;
 
     /* declare buffer, buffer size is the compressed size*/
-    char buffer[readed_compressed_size];
+    char buffer[compressed_size];
     /* declare data, data size is equal to decompressed size without header(48byte), Adler 32 checksum(4byte), 
     decompressed size (4byte) and compressed size(4byte), in total (60byte)*/
-    char data[readed_decompressed_size];
+    char data[decompressed_size];
     /* number of byte readed*/
     int num_read = 0;
 
@@ -125,7 +125,7 @@
     gzseek (infile, 48+4+4+4, SEEK_CUR);
 
     /* read input compressed data file*/
-    while ((num_read = gzread(infile, buffer, readed_compressed_size)) > 0)
+    while ((num_read = gzread(infile, buffer, compressed_size)) > 0)
     {
        /* inflate buffer into data*/
        /* zlib struct*/
@@ -136,11 +136,11 @@
 
        /* setup "buffer" as the input and "data" as the decompressed output*/
        /* size of input*/
-       infstream.avail_in = readed_compressed_size;
+       infstream.avail_in = compressed_size;
        /* input char array*/
        infstream.next_in = (Bytef *)buffer;
        /* size of output*/
-       infstream.avail_out = readed_decompressed_size;
+       infstream.avail_out = decompressed_size;
        /* output char array*/
        infstream.next_out = (Bytef *)data;
          
@@ -149,15 +149,15 @@
        inflate(&infstream, Z_NO_FLUSH);
        inflateEnd(&infstream);
 
-       if(data[readed_compressed_size]!='\n')
+       if(data[compressed_size]!='\n')
        {
           /* write uncompressed data removing last NULL byte*/
-          fwrite(data, 1, readed_decompressed_size-1, outfile);
+          fwrite(data, 1, decompressed_size-1, outfile);
        }
        else
        {
           /* write uncompressed data*/
-          fwrite(data, 1, readed_decompressed_size, outfile);
+          fwrite(data, 1, decompressed_size, outfile);
        }
 
        /* debug*/
@@ -716,13 +716,13 @@
        deflateEnd(&defstream);
 
        /* obtain information of decompressed size*/
-       writed_decompressed_size = defstream.total_in;
+       decompressed_size = defstream.total_in;
 
        /* obtain information of compressed size*/
-       writed_compressed_size = defstream.total_out;
+       compressed_size = defstream.total_out;
 
        /* calculate Adler32*/
-       writed_Adler32 = adler32(0, data, input_file_size);
+       Adler32 = adler32(0, data, input_file_size);
 	   
        /* first 48 bytes = header (not compressed, composed by "PIAFILEVERSION_2.0,???VER1,compress/r/npmzlibcodec)
        next 4 bytes Adler32 checksum
@@ -732,39 +732,39 @@
        fprintf(outfile,"PIAFILEVERSION_2.0,%c%c%cVER1,compress\r\npmzlibcodec", header[19], header[20], header[21]);
 
        /* divide adler32 in 4 bytes*/
-       checksum[3] = (writed_Adler32 >> 24) & 0xFF;
-       checksum[2] = (writed_Adler32 >> 16) & 0xFF;
-       checksum[1] = (writed_Adler32 >> 8) & 0xFF;
-       checksum[0] = writed_Adler32 & 0xFF;
+       checksum[3] = (Adler32 >> 24) & 0xFF;
+       checksum[2] = (Adler32 >> 16) & 0xFF;
+       checksum[1] = (Adler32 >> 8) & 0xFF;
+       checksum[0] = Adler32 & 0xFF;
 
        /* write adler 32 (bytes number 49-50-51-52)*/
        fprintf(outfile,"%c%c%c%c", checksum[0], checksum[1], checksum[2], checksum[3]);
 
        /* divide uncompressed size in 4 bytes*/
-       checksum[7] = (writed_decompressed_size >> 24) & 0xFF;
-       checksum[6] = (writed_decompressed_size >> 16) & 0xFF;
-       checksum[5] = (writed_decompressed_size >> 8) & 0xFF;
-       checksum[4] = writed_decompressed_size & 0xFF;
+       checksum[7] = (decompressed_size >> 24) & 0xFF;
+       checksum[6] = (decompressed_size >> 16) & 0xFF;
+       checksum[5] = (decompressed_size >> 8) & 0xFF;
+       checksum[4] = decompressed_size & 0xFF;
 
        /* write uncompressed size (bytes number 53-54-55-56)*/
        fprintf(outfile,"%c%c%c%c", checksum[4], checksum[5], checksum[6], checksum[7]);
 
        /* divide compressed size in 4 bytes*/
-       checksum[11] = (writed_compressed_size >> 24) & 0xFF;
-       checksum[10] = (writed_compressed_size >> 16) & 0xFF;
-       checksum[9] = (writed_compressed_size >> 8) & 0xFF;
-       checksum[8] = writed_compressed_size & 0xFF;
+       checksum[11] = (compressed_size >> 24) & 0xFF;
+       checksum[10] = (compressed_size >> 16) & 0xFF;
+       checksum[9] = (compressed_size >> 8) & 0xFF;
+       checksum[8] = compressed_size & 0xFF;
 
        /* write compressed size (bytes number 57-58-59-60)*/
        fprintf(outfile,"%c%c%c%c", checksum[8], checksum[9], checksum[10], checksum[11]);
 	   
        /* write compressed data*/
-       fwrite(buffer, sizeof(char), writed_compressed_size, outfile);
+       fwrite(buffer, sizeof(char), compressed_size, outfile);
 
        /* debug*/
        #if DEBUG
-       printf("readed %d decompressed bytes, expected %d bytes\n", writed_decompressed_size, input_file_size);
-       printf("writed %d compressed bytes\n", writed_compressed_size);
+       printf("readed %d decompressed bytes, expected %d bytes\n", decompressed_size, input_file_size);
+       printf("writed %d compressed bytes\n", compressed_size);
        #endif
     }
 
