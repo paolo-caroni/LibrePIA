@@ -21,13 +21,6 @@
 
 /* initial value of number of stile (on CTB=255, on STB can be infinite)*/
 int total_style_number;
-/* boolean, define TRUE and FALSE
-_Bool aci_table_available;
-_Bool apply_factor;
-_Bool adaptive_linetype[MAX_STYLE];
-const int TRUE = 1;
-const int FALSE = 0;
-*/
 
 /* description of the file*/
 char file_description[1027];
