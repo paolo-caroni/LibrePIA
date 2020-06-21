@@ -1102,3 +1102,22 @@
     }
  }
 
+ /* funtion for splint integer value to color_type, R, G, B*/
+ int int2typergb(int integer_color_value)
+ {
+    /* divide integer in 4 bytes*/
+    color_type = (integer_color_value >> 24) & 0xFF;
+    R = (integer_color_value >> 16) & 0xFF;
+    G = (integer_color_value >> 8) & 0xFF;
+    B = integer_color_value & 0xFF;
+ }
+
+ /* funtion for unify in an integer value the splitted color_type, R, G, B*/
+ int typergb2int(int color_type, int R, int G, int B)
+ {
+    /* divide integer in 4 bytes*/
+    integer_color_value = (integer_color_value << 8) + color_type;
+    integer_color_value = (integer_color_value << 8) + R;
+    integer_color_value = (integer_color_value << 8) + G;
+    integer_color_value = (integer_color_value << 8) + B;
+ }
