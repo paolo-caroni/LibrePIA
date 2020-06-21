@@ -62,3 +62,6 @@ int end_style[MAX_STYLE];
 int join_style[MAX_STYLE];
 /* custom_lineweight_table*/
 float custom_lineweight_table[27];
+
+/* declare ACI colors*/
+unsigned int aci_color[256];

@@ -24,6 +24,7 @@
 /* include header files*/
 #include "LibrePIA.h"
 #include "plot_style_table.h"
+#include "ACI.h"
 
 
  /* obtain information of version,file subclass type and sizes*/
