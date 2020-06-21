@@ -23,7 +23,6 @@
 #include <zlib.h>
 /* include header files*/
 #include "LibrePIA.h"
-#include "plot_style_table.h"
 
  /* proof of concept for create a new default stb*/
  int main(int argc, char **argv)

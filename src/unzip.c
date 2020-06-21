@@ -23,7 +23,6 @@
 #include <zlib.h>
 /* include header files*/
 #include "LibrePIA.h"
-#include "plot_style_table.h"
 
  /* proof of concept for decompress PIA file in a text form,
  can be used for all PIA file (ctb, stb, pc3, pmp)*/
