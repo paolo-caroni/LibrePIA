@@ -15,7 +15,7 @@
  */
 
 /* define values of ACI colors*/
-unsigned int aci_color[256]={
+int aci_color[256]={
 0xc3000000,
 0xc3ff0000,
 0xc3ffff00,
