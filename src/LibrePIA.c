@@ -455,7 +455,14 @@
        /* verify correct end for CTB*/
        else if (header[19]=='C' && header[20]=='T' && header[21]=='B' && k==254 && line_buffer[0]!='}')
        {
-          fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
+          fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%s\"\n", line_buffer);
+       }
+       /* verify correct end for STB*/
+       else if (header[19]=='S' && header[20]=='T' && header[21]=='B' && k==MAX_STYLE-1 && line_buffer[0]!='}')
+       {
+          fprintf(stderr, "end of plot_style, expected \"}\" obtained \"%s\"\n", line_buffer);
+          fprintf(stderr, "This STB have more than %d plot styles, all styles over %d would be lost with the custom_lineweight_table\n", MAX_STYLE, MAX_STYLE);
+          fprintf(stderr, "Please decompress your file, edit and recompress it manually, don't use the automated program\n");
        }
     }
 
@@ -466,8 +473,9 @@
     }
     else
     {
-       fprintf(stderr, "ERROR!\nexpected: \"custom_lineweight_table{\"\nobtained: \"%s\"", line_buffer);
+          fprintf(stderr, "ERROR!\nexpected: \"custom_lineweight_table{\"\nobtained: \"%s\"\n", line_buffer);
     }
+
     /* read values from custom_lineweight_table*/
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer," 0=%f",&custom_lineweight_table[0]);
