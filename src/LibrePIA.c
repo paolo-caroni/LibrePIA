@@ -718,7 +718,9 @@
        defstream.next_out = (Bytef *)buffer;
 
        /* the real compression work, this seems to be different from original deflate compression, need more investigations*/
-       deflateInit(&defstream, Z_DEFAULT_COMPRESSION);
+       /*deflateInit(&defstream, Z_BEST_COMPRESSION);*/
+       /*deflateInit2(&defstream, Z_BEST_COMPRESSION, Z_DEFLATED, 15, 8, Z_DEFAULT_STRATEGY);*/
+       deflateInit(&defstream, 7);
        deflate(&defstream, Z_FINISH);
        deflateEnd(&defstream);
 
