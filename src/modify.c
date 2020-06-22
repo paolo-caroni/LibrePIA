@@ -34,6 +34,8 @@
     /* verify subclass type*/
     if (header[19]=='C' && header[20]=='T' && header[21]=='B')
     {
+       fprintf(stderr, "Since automated modification isn't yet supported, you have to modify manually your file \"%s\" then tape ENTER key to save the output.", argv[2]);
+       getchar();
        /* parse ctb*/
        plot_style_parser(argv[2]);
        /* here can be put a code for modify the values
@@ -44,6 +46,8 @@
 
     else if (header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
+       fprintf(stderr, "Since automated modification isn't yet supported, you have to modify manually your file \"%s\" then tape ENTER key to save the output.", argv[2]);
+       getchar();
        /* parse stb*/
        plot_style_parser(argv[2]);
        fprintf(stderr, "Sorry, actually can be readed, writed or edited max %d styles, your file have %d styles.\n\n", MAX_STYLE, total_style_number);
@@ -56,14 +60,14 @@
     else if (header[19]=='P' && header[20]=='C' && header[21]=='3')
     {
        fprintf(stderr, "Sorry, the .pc3 subclass type isn't yet supported.\nMaybe .pc3 would be never supported since is correlated to .hdi file.\n\n");
-       fprintf(stderr, "Since automated modification isn't supported, you have to modify manually your file \"%s\" then tape any key to save the output.", argv[2]);
+       fprintf(stderr, "Since automated modification isn't supported, you have to modify manually your file \"%s\" then tape ENTER key to save the output.", argv[2]);
        getchar();
     }
 
     else if (header[19]=='P' && header[20]=='M' && header[21]=='P')
     {
        fprintf(stderr, "Sorry, the .pmp subclass type isn't yet supported.\nThe support of .pmp. isn't a priority.\n\n");
-       fprintf(stderr, "Since automated modification isn't supported, you have to modify manually your file \"%s\" then tape any key to save the output.", argv[2]);
+       fprintf(stderr, "Since automated modification isn't supported, you have to modify manually your file \"%s\" then tape ENTER key to save the output.", argv[2]);
        getchar();
     }
 
