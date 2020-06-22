@@ -200,7 +200,7 @@
     /* Parse ctb file*/
     /* first line, description, can contain space*/
     fgets(line_buffer,sizeof(line_buffer),infile);
-    sscanf(line_buffer,"description=%[^\n]",&file_description);
+    sscanf(line_buffer,"description=\"%[^\n]",&file_description);
     /* second line, aci_table_available, always TRUE*/
     fgets(line_buffer,sizeof(line_buffer),infile);
     sscanf(line_buffer,"aci_table_available=%c",&aci_table_available);
@@ -216,7 +216,7 @@
 
 
     #if DEBUG
-    printf("description=%s\n",file_description);
+    printf("description=\"%s\n",file_description);
     if (aci_table_available==84)
     {
     printf("aci_table_available=TRUE\n");
@@ -311,21 +311,21 @@
 
        /* color/named plot style value name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       sscanf(line_buffer,"  name=%[^\n]",&name[k]);
+       sscanf(line_buffer,"  name=\"%[^\n]",&name[k]);
        #if DEBUG
-       printf("name=%s\n",name[k]);
+       printf("name=\"%s\n",name[k]);
        #endif
        /* color/named plot style value localized_name*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       sscanf(line_buffer,"  localized_name=%[^\n]",&localized_name[k]);
+       sscanf(line_buffer,"  localized_name=\"%[^\n]",&localized_name[k]);
        #if DEBUG
-       printf("localized_name=%s\n",localized_name[k]);
+       printf("localized_name=\"%s\n",localized_name[k]);
        #endif
        /* color/named plot style value description*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       sscanf(line_buffer,"  description=%[^\n]",&description[k]);
+       sscanf(line_buffer,"  description=\"%[^\n]",&description[k]);
        #if DEBUG
-       printf("description=%s\n",description[k]);
+       printf("description=\"%s\n",description[k]);
        #endif
        /* color/named plot style value color*/
        fgets(line_buffer,sizeof(line_buffer),infile);
@@ -544,7 +544,7 @@
 
     /* Parse ctb or stb file*/
     /* first line, description, can contain space*/
-    fprintf(writed,"description=%s\n",file_description);
+    fprintf(writed,"description=\"%s\n",file_description);
     /* second line, aci_table_available, always TRUE for ctb*/
     if (aci_table_available==84)
     {
@@ -584,7 +584,7 @@
        for(k=0;k<255;k++)
        {
           /* write aci_table values*/
-          fprintf(writed," %d=%s\n",k,name[k]);
+          fprintf(writed," %d=\"%s\n",k,name[k]);
        }
        /* line 262 end of aci_table*/
        fprintf(writed,"}\n");
@@ -598,11 +598,11 @@
        /* color/named plot style value color init (number)*/
        fprintf(writed," %d{\n",k);
        /* color/named plot style value name*/
-       fprintf(writed,"  name=%s\n",name[k]);
+       fprintf(writed,"  name=\"%s\n",name[k]);
        /* color/named plot style value localized_name*/
-       fprintf(writed,"  localized_name=%s\n",localized_name[k]);
+       fprintf(writed,"  localized_name=\"%s\n",localized_name[k]);
        /* color/named plot style value description*/
-       fprintf(writed,"  description=%s\n",description[k]);
+       fprintf(writed,"  description=\"%s\n",description[k]);
        /* color/named plot style value color*/
        fprintf(writed,"  color=%d\n",color[k]);
        /* Verify if mode_color exist*/
@@ -792,7 +792,7 @@
     /* set total_style_number to 255 (in CTB are always 255)*/
     total_style_number=255;
     /* first line, description, can contain space*/
-    sprintf( file_description, "\"");
+    sprintf( file_description, "");
     /* second line, aci_table_available, always TRUE for ctb*/
     aci_table_available=84;
     /* third line, scale_factor*/
@@ -808,11 +808,11 @@
     for(k=0; k<total_style_number; k++)
     {
        /* color plot style value name*/
-       sprintf( name[k], "\"Color_%d", k+1);
+       sprintf( name[k], "Color_%d", k+1);
        /* color plot style value localized_name*/
-       sprintf(localized_name[k], "\"Color_%d", k+1);
+       sprintf(localized_name[k], "Color_%d", k+1);
        /* color plot style value description*/
-       sprintf( description[k], "\"");
+       sprintf( description[k], "");
        /* color plot style value color*/
        color[k]=-1;
        /* color plot style mode_color for default dosn't exist*/
@@ -879,7 +879,7 @@
     /* declare number of plot styles*/
     total_style_number=2;
     /* first line, description, can contain space*/
-    sprintf( file_description, "\"");
+    sprintf( file_description, "");
     /* second line, aci_table_available, always FALSE for stb*/
     aci_table_available=70;
     /* third line, scale_factor*/
@@ -889,11 +889,11 @@
     /* fifth line, custom_lineweight_display_units*/
     custom_lineweight_display_units=0;
     /* named plot style value name*/
-    sprintf( name[0], "\"Normal");
+    sprintf( name[0], "Normal");
     /* named plot style value localized_name*/
-    sprintf( localized_name[0], "\"Normal");
+    sprintf( localized_name[0], "Normal");
     /* named plot style value description*/
-    sprintf( description[0], "\"");
+    sprintf( description[0], "");
     /* named plot style value color*/
     color[0]=-1;
     /* named plot style mode_color for default dosn't exist*/
@@ -920,11 +920,11 @@
     /* named plot style value join_style*/
     join_style[0]=5;
     /* named plot style value name*/
-    sprintf( name[1], "\"Style_1");
+    sprintf( name[1], "Style_1");
     /* named plot style value localized_name*/
-    sprintf( localized_name[1], "\"Style 1");
+    sprintf( localized_name[1], "Style 1");
     /* named plot style value description*/
-    sprintf( description[1], "\"");
+    sprintf( description[1], "");
     /* named plot style value color*/
     color[1]=-1;
     /* named plot style mode_color for default dosn't exist*/
@@ -991,11 +991,11 @@
        /* increase plot_style_number (add a plot style)*/
        total_style_number++;
        /* named plot style value name*/
-       sprintf( name[k], "\"Style_%d", k);
+       sprintf( name[k], "Style_%d", k);
        /* named plot style value localized_name*/
-       sprintf( localized_name[k], "\"Style %d",k);
+       sprintf( localized_name[k], "Style %d",k);
        /* named plot style value description*/
-       sprintf( description[k], "\"");
+       sprintf( description[k], "");
        /* named plot style value color*/
        color[k]=-1;
        /* Verify if mode_color exist on precedent plot style*/
