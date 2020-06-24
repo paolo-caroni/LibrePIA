@@ -115,6 +115,7 @@ This however is partially wrong, because <cite>C3FFFFFF</cite> is also "use obje
 the decimal number <cite>-1008877202</cite> expressed as hex signed 2's complement is <cite>C3DDC16E</cite>.<br><!-- wrong value example -->
 In theory is an <a href="ACI.html" title="Autocad Colour Index">ACI</a> color, but R=DD=221, G=C1=193, B=6E=110 isn't an <a href="ACI.html" title="Autocad Colour Index">ACI</a> possible value.<br>
 Here is where mode_color helps, if color is an impossible color number, the color seems to be defined with mode_color (honestly I don't understand why).<br>
+If the color value in this example is manually modified the program doesn't seems to give any error, so probably this value is simply ignored.<br>
 <br>
 <h4>mode_color=</h4>
 <p>
@@ -122,6 +123,7 @@ Here is where mode_color helps, if color is an impossible color number, the colo
 The scope is not very clear to me.<br><br>
 Default value is not clear<br><br>
 Optional,not present in all STB, so for writing a basic ctb maybe can be ignored.<br>
+However if present this is the real color value and the color= can be wrong, so if mode_color exist color can be ignored.<br>
 Unlike the <a href="CTB.html" title="Color-dependent Plot Style Table">CTB</a> the mode_color presence can't be desumed by number of line, since STB have a variable number of plot style.<br>
 Need much more investigations.<br>
 If the color value is an <a href="ACI.html" title="Autocad Colour Index">ACI</a> mode_color==color.<br>
