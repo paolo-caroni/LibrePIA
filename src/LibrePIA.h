@@ -45,7 +45,7 @@ int new_stb();
 int add_plot_style_stb();
 int remove_plot_style_stb(int position);
 int int2typergb(int integer_color_value);
-int typergb2int(int color_type, int R, int G, int B);
+int rgb2int(int R, int G, int B);
 int change_color(int integer_color_value, int position);
 
 

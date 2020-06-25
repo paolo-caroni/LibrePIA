@@ -1116,12 +1116,12 @@
     B = integer_color_value & 0xFF;
  }
 
- /* funtion for unify in an integer value the splitted color_type, R, G, B*/
- int typergb2int(int color_type, int R, int G, int B)
+ /* funtion for unify in an integer value the splitted R, G, B values*/
+ int rgb2int(int R, int G, int B)
  {
     if (R<0 || G<0 || B<0 || R>255 || G>255 || B>255)
     {
-       fprintf(stderr,"Invalid color! Please enter position between 0 to 255.\n");
+       fprintf(stderr,"Invalid color! Please enter values between 0 to 255.\n");
     }
     else
     {
@@ -1132,12 +1132,8 @@
        integer_color_value = (integer_color_value << 8) + R;
        integer_color_value = (integer_color_value << 8) + G;
        integer_color_value = (integer_color_value << 8) + B;
-       /* verify if color_type have a possible value*/
-       if (color_type!=0xc0 || color_type!=0xc1 || color_type!=0xc2 || color_type!=0xc3)
-       {
-          /* if not possible set to Truecolor*/
-          color_type=0xc2;
-       }
+       /* set Truecolor as default*/
+       color_type=0xc2;
        /* loop for all aci colors*/
        for (k=0;k<sizeof(aci_color);k++)
        {
@@ -1150,7 +1146,7 @@
        }
        /* remove old value of integer_color_value*/
        integer_color_value=0;
-       /* unify 4 bytes in an integer value*/
+       /* unify all 4 bytes in an integer value*/
        integer_color_value = (integer_color_value << 8) + color_type;
        integer_color_value = (integer_color_value << 8) + R;
        integer_color_value = (integer_color_value << 8) + G;
