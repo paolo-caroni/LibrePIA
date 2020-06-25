@@ -282,7 +282,7 @@
        fprintf(stderr,"end of aci_table on wrong line\n");
        fprintf(stderr,"expected } obtained %c\n",line_buffer[0]);
        }
-	}
+    }
 
     /* start of plot_style sctruct (line 263 on ctb, line 6 on stb)*/
     fgets(line_buffer,sizeof(line_buffer),infile);
@@ -473,7 +473,7 @@
     }
     else
     {
-          fprintf(stderr, "ERROR!\nexpected: \"custom_lineweight_table{\"\nobtained: \"%s\"\n", line_buffer);
+       fprintf(stderr, "ERROR!\nexpected: \"custom_lineweight_table{\"\nobtained: \"%s\"\n", line_buffer);
     }
 
     /* read values from custom_lineweight_table*/
@@ -1045,21 +1045,15 @@
 
 
  /* funtion for remove a plot style on STB*/
- int remove_plot_style_stb()
+ int remove_plot_style_stb(int position)
  {
     /* verify if is an STB*/
     if(header[19]=='S' && header[20]=='T' && header[21]=='B')
     {
-       /* Input element position to delete */
-       printf("Plot style position minimum \"1\", maximum \"%d\".\n", total_style_number);
-       printf("Enter the plot style position number to delete : ");
-       scanf("%d", &position);
-
-
-       /* Invalid delete position */
+       /* invalid position */
        if(position <= 0 || position > total_style_number)
        {
-           fprintf(stderr,"Invalid number! Please enter position between 1 to %d.\n", total_style_number);
+           fprintf(stderr,"Invalid plot style number! Please enter position between 1 to %d.\n", total_style_number);
        }
        else
        {
@@ -1125,9 +1119,69 @@
  /* funtion for unify in an integer value the splitted color_type, R, G, B*/
  int typergb2int(int color_type, int R, int G, int B)
  {
-    /* divide integer in 4 bytes*/
-    integer_color_value = (integer_color_value << 8) + color_type;
-    integer_color_value = (integer_color_value << 8) + R;
-    integer_color_value = (integer_color_value << 8) + G;
-    integer_color_value = (integer_color_value << 8) + B;
+    if (R<0 || G<0 || B<0 || R>255 || G>255 || B>255)
+    {
+       fprintf(stderr,"Invalid color! Please enter position between 0 to 255.\n");
+    }
+    else
+    {
+       /* remove old value of integer_color_value and k*/
+       integer_color_value=0;
+       k=0;
+       /* unify 3 bytes in an integer value*/
+       integer_color_value = (integer_color_value << 8) + R;
+       integer_color_value = (integer_color_value << 8) + G;
+       integer_color_value = (integer_color_value << 8) + B;
+       /* verify if color_type have a possible value*/
+       if (color_type!=0xc0 || color_type!=0xc1 || color_type!=0xc2 || color_type!=0xc3)
+       {
+          /* if not possible set to Truecolor*/
+          color_type=0xc2;
+       }
+       /* loop for all aci colors*/
+       for (k=0;k<sizeof(aci_color);k++)
+       {
+          /* search integer_color_value on ACI list (aci_color)*/
+          if (integer_color_value==aci_color[k] && color_type!=0xc3)
+          {
+             /* force set to ACI*/
+             color_type=0xc3;
+          }
+       }
+       /* remove old value of integer_color_value*/
+       integer_color_value=0;
+       /* unify 4 bytes in an integer value*/
+       integer_color_value = (integer_color_value << 8) + color_type;
+       integer_color_value = (integer_color_value << 8) + R;
+       integer_color_value = (integer_color_value << 8) + G;
+       integer_color_value = (integer_color_value << 8) + B;
+    }
+ }
+
+ /* function for change color*/
+ int change_color(int integer_color_value, int position)
+ {
+    /* invalid position */
+    if(position<=0 || position>total_style_number)
+    {
+       fprintf(stderr,"Invalid plot style number! Please enter position between 1 to %d.\n", total_style_number);
+    }
+    else
+    {
+       /* set k to position-1*/
+       k=position-1;
+       /* mode_color exist*/
+       if (mode_color[k]!='\0')
+       {
+          /* original output can differ to this, but isn't a problem see ctb and stb specifrication*/
+          color[k]=integer_color_value;
+          mode_color[k]=integer_color_value;
+       }
+
+       /* mode_color don't exist*/
+       else
+       {
+          color[k]=integer_color_value;
+       }
+    }
  }

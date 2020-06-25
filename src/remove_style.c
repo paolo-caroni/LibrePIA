@@ -35,9 +35,18 @@
     {
        /* parse stb*/
        plot_style_parser(argv[2]);
+       /* print warning about MAX_STYLE*/
        fprintf(stderr, "Sorry, actually can be readed, writed or edited max %d styles, your file have %d styles.\n\n", MAX_STYLE, total_style_number);
-       remove_plot_style_stb();
-       fprintf(stderr,"actually your file will have %d styles.", total_style_number);
+       /* print actual number of styles*/
+       printf("actually your file have %d styles.", total_style_number);
+       /* set plot style position to delete */
+       printf("Plot style position minimum \"1\", maximum \"%d\".\n", total_style_number);
+       printf("Enter the plot style position number to delete : ");
+       scanf("%d", &position);
+       /* remove plot style*/
+       remove_plot_style_stb(position);
+       /* print actual number of styles*/
+       printf("actually your file will have %d styles.", total_style_number);
        /* rewrite txt for stb*/
        plot_style_writer(argv[2]);
     }
