@@ -708,6 +708,12 @@
     /* read input compressed data file*/
     while ((num_read = fread(data, sizeof(char), input_file_size, infile)) > 0)
     {
+       /* verify correct end of file syntax*/
+       if(data[input_file_size-2]!='}' && data[input_file_size-1]!='\n')
+       {
+          fprintf(stderr,"SYNTAX ERROR: incorrect end of file on input file.\n");
+          fprintf(stderr,"expected }\nobtained %c%c\n", data[input_file_size-2], data[input_file_size-1]);
+       }
        /* deflate buffer into data*/
        /* zlib struct*/
        z_stream defstream;
@@ -717,7 +723,7 @@
 
        /* setup "buffer" as the compressed output and "data" as the decompressed input*/
        /* size of input plus terminator*/
-       defstream.avail_in = input_file_size+1;
+       defstream.avail_in = strlen(data)+1;
        /* input char array*/
        defstream.next_in = (Bytef *)data;
        /* size of output*/
@@ -728,7 +734,7 @@
        /* the real compression work, this seems to be different from original deflate compression, need more investigations*/
        /*deflateInit(&defstream, Z_BEST_COMPRESSION);*/
        /*deflateInit2(&defstream, Z_BEST_COMPRESSION, Z_DEFLATED, 15, 8, Z_DEFAULT_STRATEGY);*/
-       deflateInit(&defstream, 7);
+       deflateInit(&defstream, Z_BEST_COMPRESSION);
        deflate(&defstream, Z_FINISH);
        deflateEnd(&defstream);
 
