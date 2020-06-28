@@ -683,9 +683,9 @@
  /* funtion for zip PIA file*/
  int write_PIA(char *infilename, char *outfilename)
  {
-    /* open compressed PIA file*/
+    /* open uncompressed PIA file*/
     FILE *infile = fopen(infilename, "rb");
-    /* create uncompressed file*/
+    /* create compressed file*/
     FILE *outfile = fopen(outfilename, "wb");
     /* verify if files exist*/
     if (!infile || !outfile) return -1;
@@ -1186,4 +1186,174 @@
           color[k]=integer_color_value;
        }
     }
+ }
+
+ /* function for change color*/
+ int export_plot_style2csv(char *outfilename)
+ {
+    /* create csv file*/
+    FILE *exported = fopen(outfilename, "wb");
+
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value name*/
+       fprintf(exported,"%s\t",name[k]);
+    }
+    /* end of name line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value localized_name*/
+       fprintf(exported,"%s\t",localized_name[k]);
+    }
+    /* end of localized_name line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value description*/
+       fprintf(exported,"%s\t",description[k]);
+    }
+    /* end of description line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value color*/
+       fprintf(exported,"%s\t",color[k]);
+    }
+    /* end of color line*/
+    fprintf(exported,"\n");
+    if(mode_color[0]!='\0')
+    {
+       /* remove old value from k*/
+       k=0;
+       for(k=0;k<total_style_number;k++)
+       {
+          /* color/named plot style value localized_name*/
+          fprintf(exported,"%s\t",mode_color[k]);
+       }
+       /* end of mode_color line*/
+       fprintf(exported,"\n");
+    }
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value color_policy*/
+       fprintf(exported,"%s\t",color_policy[k]);
+    }
+    /* end of color_policy line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value physical_pen_number*/
+       fprintf(exported,"%s\t",physical_pen_number[k]);
+    }
+    /* end of physical_pen_number line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value virtual_pen_number*/
+       fprintf(exported,"%s\t",virtual_pen_number[k]);
+    }
+    /* end of virtual_pen_number line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value screen*/
+       fprintf(exported,"%s\t",screen[k]);
+    }
+    /* end of screen line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value linepattern_size*/
+       fprintf(exported,"%s\t",linepattern_size[k]);
+    }
+    /* end of linepattern_size line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value linetype*/
+       fprintf(exported,"%s\t",linetype[k]);
+    }
+    /* end of linetype line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value adaptive_linetype (TRUE or FALSE)*/
+       if (adaptive_linetype[k]==84)
+       {
+       fprintf(exported,"  adaptive_linetype=TRUE\n");
+       }
+       else if (adaptive_linetype[k]==70)
+       {
+       fprintf(exported,"  adaptive_linetype=FALSE\n");
+       }
+       /* if impossible value set to default*/
+       else
+       {
+       fprintf(exported,"  adaptive_linetype=TRUE\n");
+       }
+    }
+    /* end of adaptive_linetype line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value lineweight*/
+       fprintf(exported,"%s\t",lineweight[k]);
+    }
+    /* end of lineweight line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value fill_style*/
+       fprintf(exported,"%s\t",fill_style[k]);
+    }
+    /* end of fill_style line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value end_style*/
+       fprintf(exported,"%s\t",end_style[k]);
+    }
+    /* end of end_style line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value join_style*/
+       fprintf(exported,"%s\t",join_style[k]);
+    }
+    /* end of join_style line*/
+    fprintf(exported,"\n");
+
+    /* close output file*/
+    fclose(exported);
  }
