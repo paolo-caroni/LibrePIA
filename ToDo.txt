@@ -13,11 +13,13 @@ Done:
 -adler32 checksum verification on decompress_data function;
 -ACI list;
 -function for split and unsplit color;
+-basic function for change color (under development);
+-export to csv and tsv;
 
 ToDo (difficulty is from my point of view):
 -correct writing compressed PIA file (very difficult);
--add basic function for modify plot_style data with program and not with editor (medium);
+-add basic program for modify plot_style data with program and not with editor (medium);
 -add complete function for modify color (medium);
--correct bug on stb with more plot_style number... study malloc (very difficult);
+-correct bug on stb with more plot_style number... study malloc (it's really important?)(very difficult);
 -add doxygen or other documentation (difficult);
 -add a gtk program for modify plot_style (maybe can be a different project, very difficult/near to impossible).
