@@ -700,8 +700,8 @@
     /* declare buffer, buffer size is the compressed size, actally I don't know how predict this size...
     so I simply assumed that is smaller than the input_file_size*/
     char buffer[input_file_size/2];
-    /* declare data, data size is equal to decompressed size (the size of the input txt file)*/
-    char data[input_file_size];
+    /* declare data, data size is equal to decompressed size (the size of the input txt file), plus a NULL byte end*/
+    char data[input_file_size+1];
     /* number of byte readed*/
     int num_read = 0;
 
@@ -714,6 +714,8 @@
           fprintf(stderr,"SYNTAX ERROR: incorrect end of file on input file.\n");
           fprintf(stderr,"expected }\nobtained %c%c\n", data[input_file_size-2], data[input_file_size-1]);
        }
+       /* set last NULL byte terminator*/
+       data[input_file_size]='\0';
        /* deflate buffer into data*/
        /* zlib struct*/
        z_stream defstream;
@@ -723,7 +725,7 @@
 
        /* setup "buffer" as the compressed output and "data" as the decompressed input*/
        /* size of input plus terminator*/
-       defstream.avail_in = strlen(data)+1;
+       defstream.avail_in = (uInt)input_file_size+1;
        /* input char array*/
        defstream.next_in = (Bytef *)data;
        /* size of output*/
@@ -746,7 +748,7 @@
 
        /* calculate Adler32*/
        Adler32 = adler32(1, buffer, compressed_size);
-	   
+   
        /* first 48 bytes = header (not compressed, composed by "PIAFILEVERSION_2.0,???VER1,compress/r/npmzlibcodec)
        next 4 bytes Adler32 checksum
        next 4 bytes (unsigned int) decompressed stream size
@@ -780,7 +782,7 @@
 
        /* write compressed size (bytes number 57-58-59-60)*/
        fprintf(outfile,"%c%c%c%c", checksum[8], checksum[9], checksum[10], checksum[11]);
-	   
+   
        /* write compressed data*/
        fwrite(buffer, sizeof(char), compressed_size, outfile);
 
@@ -1106,9 +1108,13 @@
            total_style_number--;
        }
     }
+    else if(header[19]=='C' && header[20]=='T' && header[21]=='B')
+    {
+       fprintf(stderr,"the file isn't an STB, plot style can't be removed on CTB\n");
+    }
     else
     {
-       fprintf(stderr,"the file isn't an STB, plot style can't be removed on CTB");
+       fprintf(stderr,"the file isn't an STB\n");
     }
  }
 
@@ -1188,8 +1194,178 @@
     }
  }
 
- /* function for change color*/
+ /* function for export plot style in csv(comma separeted values)*/
  int export_plot_style2csv(char *outfilename)
+ {
+    /* create csv file*/
+    FILE *exported = fopen(outfilename, "wb");
+
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value name*/
+       fprintf(exported,"%s,",name[k]);
+    }
+    /* end of name line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value localized_name*/
+       fprintf(exported,"%s,",localized_name[k]);
+    }
+    /* end of localized_name line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value description*/
+       fprintf(exported,"\"%s\",",description[k]);
+    }
+    /* end of description line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value color*/
+       fprintf(exported,"%d,",color[k]);
+    }
+    /* end of color line*/
+    fprintf(exported,"\n");
+    if(mode_color[0]!='\0')
+    {
+       /* remove old value from k*/
+       k=0;
+       for(k=0;k<total_style_number;k++)
+       {
+          /* color/named plot style value localized_name*/
+          fprintf(exported,"%d,",mode_color[k]);
+       }
+       /* end of mode_color line*/
+       fprintf(exported,"\n");
+    }
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value color_policy*/
+       fprintf(exported,"%d,",color_policy[k]);
+    }
+    /* end of color_policy line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value physical_pen_number*/
+       fprintf(exported,"%d,",physical_pen_number[k]);
+    }
+    /* end of physical_pen_number line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value virtual_pen_number*/
+       fprintf(exported,"%d,",virtual_pen_number[k]);
+    }
+    /* end of virtual_pen_number line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value screen*/
+       fprintf(exported,"%d,",screen[k]);
+    }
+    /* end of screen line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value linepattern_size*/
+       fprintf(exported,"%1.1f,",linepattern_size[k]);
+    }
+    /* end of linepattern_size line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value linetype*/
+       fprintf(exported,"%d,",linetype[k]);
+    }
+    /* end of linetype line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value adaptive_linetype (TRUE or FALSE)*/
+       if (adaptive_linetype[k]==84)
+       {
+       fprintf(exported,"TRUE,");
+       }
+       else if (adaptive_linetype[k]==70)
+       {
+       fprintf(exported,"FALSE,");
+       }
+       /* if impossible value set to default*/
+       else
+       {
+       fprintf(exported,"TRUE,");
+       }
+    }
+    /* end of adaptive_linetype line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value lineweight*/
+       fprintf(exported,"%d,",lineweight[k]);
+    }
+    /* end of lineweight line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value fill_style*/
+       fprintf(exported,"%d,",fill_style[k]);
+    }
+    /* end of fill_style line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value end_style*/
+       fprintf(exported,"%d,",end_style[k]);
+    }
+    /* end of end_style line*/
+    fprintf(exported,"\n");
+    /* remove old value from k*/
+    k=0;
+    for(k=0;k<total_style_number;k++)
+    {
+       /* color/named plot style value join_style*/
+       fprintf(exported,"%d,",join_style[k]);
+    }
+    /* end of join_style line*/
+    fprintf(exported,"\n");
+
+    /* close output file*/
+    fclose(exported);
+ }
+
+ /* function for export plot style in tsv(table separeted values)*/
+ int export_plot_style2tsv(char *outfilename)
  {
     /* create csv file*/
     FILE *exported = fopen(outfilename, "wb");
@@ -1226,7 +1402,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value color*/
-       fprintf(exported,"%s\t",color[k]);
+       fprintf(exported,"%d\t",color[k]);
     }
     /* end of color line*/
     fprintf(exported,"\n");
@@ -1237,7 +1413,7 @@
        for(k=0;k<total_style_number;k++)
        {
           /* color/named plot style value localized_name*/
-          fprintf(exported,"%s\t",mode_color[k]);
+          fprintf(exported,"%d\t",mode_color[k]);
        }
        /* end of mode_color line*/
        fprintf(exported,"\n");
@@ -1247,7 +1423,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value color_policy*/
-       fprintf(exported,"%s\t",color_policy[k]);
+       fprintf(exported,"%d\t",color_policy[k]);
     }
     /* end of color_policy line*/
     fprintf(exported,"\n");
@@ -1256,7 +1432,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value physical_pen_number*/
-       fprintf(exported,"%s\t",physical_pen_number[k]);
+       fprintf(exported,"%d\t",physical_pen_number[k]);
     }
     /* end of physical_pen_number line*/
     fprintf(exported,"\n");
@@ -1265,7 +1441,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value virtual_pen_number*/
-       fprintf(exported,"%s\t",virtual_pen_number[k]);
+       fprintf(exported,"%d\t",virtual_pen_number[k]);
     }
     /* end of virtual_pen_number line*/
     fprintf(exported,"\n");
@@ -1274,7 +1450,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value screen*/
-       fprintf(exported,"%s\t",screen[k]);
+       fprintf(exported,"%d\t",screen[k]);
     }
     /* end of screen line*/
     fprintf(exported,"\n");
@@ -1283,7 +1459,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value linepattern_size*/
-       fprintf(exported,"%s\t",linepattern_size[k]);
+       fprintf(exported,"%1.1f\t",linepattern_size[k]);
     }
     /* end of linepattern_size line*/
     fprintf(exported,"\n");
@@ -1292,7 +1468,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value linetype*/
-       fprintf(exported,"%s\t",linetype[k]);
+       fprintf(exported,"%d\t",linetype[k]);
     }
     /* end of linetype line*/
     fprintf(exported,"\n");
@@ -1303,16 +1479,16 @@
        /* color/named plot style value adaptive_linetype (TRUE or FALSE)*/
        if (adaptive_linetype[k]==84)
        {
-       fprintf(exported,"  adaptive_linetype=TRUE\n");
+       fprintf(exported,"TRUE\t");
        }
        else if (adaptive_linetype[k]==70)
        {
-       fprintf(exported,"  adaptive_linetype=FALSE\n");
+       fprintf(exported,"FALSE\t");
        }
        /* if impossible value set to default*/
        else
        {
-       fprintf(exported,"  adaptive_linetype=TRUE\n");
+       fprintf(exported,"TRUE\t");
        }
     }
     /* end of adaptive_linetype line*/
@@ -1322,7 +1498,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value lineweight*/
-       fprintf(exported,"%s\t",lineweight[k]);
+       fprintf(exported,"%d\t",lineweight[k]);
     }
     /* end of lineweight line*/
     fprintf(exported,"\n");
@@ -1331,7 +1507,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value fill_style*/
-       fprintf(exported,"%s\t",fill_style[k]);
+       fprintf(exported,"%d\t",fill_style[k]);
     }
     /* end of fill_style line*/
     fprintf(exported,"\n");
@@ -1340,7 +1516,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value end_style*/
-       fprintf(exported,"%s\t",end_style[k]);
+       fprintf(exported,"%d\t",end_style[k]);
     }
     /* end of end_style line*/
     fprintf(exported,"\n");
@@ -1349,7 +1525,7 @@
     for(k=0;k<total_style_number;k++)
     {
        /* color/named plot style value join_style*/
-       fprintf(exported,"%s\t",join_style[k]);
+       fprintf(exported,"%d\t",join_style[k]);
     }
     /* end of join_style line*/
     fprintf(exported,"\n");

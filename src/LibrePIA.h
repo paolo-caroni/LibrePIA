@@ -48,6 +48,7 @@ int int2typergb(int integer_color_value);
 int rgb2int(int R, int G, int B);
 int change_color(int integer_color_value, int position);
 int export_plot_style2csv(char *);
+int export_plot_style2tsv(char *);
 
 
 
