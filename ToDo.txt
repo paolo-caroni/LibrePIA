@@ -4,7 +4,7 @@ Done:
 -decompress data;
 -plot_style parser;
 -plot_style writer;
--write header and compress data all in one function called write_PIA (bugged, syntax error?);
+-write header and compress data all in one function called write_PIA (compatible);
 -function for create new stb with deafult values;
 -function for create new ctb with deafult values;
 -function for add new plot_style on a stb;
@@ -17,9 +17,10 @@ Done:
 -export to csv and tsv;
 
 ToDo (difficulty is from my point of view):
--correct writing compressed PIA file (very difficult);
+
 -add basic program for modify plot_style data with program and not with editor (medium);
--add complete function for modify color (medium);
--correct bug on stb with more plot_style number... study malloc (it's really important?)(very difficult);
+-improve and test function for modify color (medium);
 -add doxygen or other documentation (difficult);
+-correct bug on stb with more plot_style number... study malloc (it's really important?)(very difficult);
+-improve and verify writing compressed PIA file (difficult);
 -add a gtk program for modify plot_style (maybe can be a different project, very difficult/near to impossible).
