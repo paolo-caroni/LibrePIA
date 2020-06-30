@@ -1134,6 +1134,9 @@
     if (R<0 || G<0 || B<0 || R>255 || G>255 || B>255)
     {
        fprintf(stderr,"Invalid color! Please enter values between 0 to 255.\n");
+       fprintf(stderr,"Red value=%d\n", R);
+       fprintf(stderr,"Green value=%d\n", G);
+       fprintf(stderr,"Blue value=%d\n", B);
     }
     else
     {
@@ -1167,12 +1170,13 @@
  }
 
  /* function for change color*/
- int change_color(int integer_color_value, int position)
+ int change_color(int integer_color_value,int position)
  {
     /* invalid position */
     if(position<=0 || position>total_style_number)
     {
        fprintf(stderr,"Invalid plot style number! Please enter position between 1 to %d.\n", total_style_number);
+       fprintf(stderr,"Position given %d\n", position);
     }
     else
     {
