@@ -788,7 +788,7 @@
 
        /* debug*/
        #if DEBUG
-       printf("readed %d decompressed bytes, expected %d bytes\n", decompressed_size, input_file_size);
+       printf("readed %d decompressed bytes, expected %d bytes\n", decompressed_size, input_file_size+1);
        printf("writed %d compressed bytes\n", compressed_size);
        #endif
     }
