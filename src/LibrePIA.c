@@ -1183,17 +1183,28 @@
        /* set k to position-1*/
        k=position-1;
        /* mode_color exist*/
-       if (mode_color[k]!='\0')
+       if(mode_color[k]!='\0')
        {
           /* original output can differ to this, but isn't a problem see ctb and stb specifrication*/
           color[k]=integer_color_value;
           mode_color[k]=integer_color_value;
        }
-
        /* mode_color don't exist*/
        else
        {
           color[k]=integer_color_value;
+       }
+       /* dithering off and grayscale off but with object color*/
+       if(color_policy[k]=0)
+       {
+          /* dithering off and grayscale off with specified color*/
+          color_policy[k]=4;
+       }
+       /* dithering on and grayscale off but with object color*/
+       else if(color_policy[k]=1)
+       {
+          /* dithering on and grayscale off with specified color*/
+          color_policy[k]=5;
        }
     }
  }
