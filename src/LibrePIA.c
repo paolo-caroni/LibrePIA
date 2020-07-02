@@ -150,6 +150,7 @@
        inflate(&infstream, Z_NO_FLUSH);
        inflateEnd(&infstream);
 
+       /* verify if the last byte of data is a \n or is a NULL byte*/
        if(data[decompressed_size-1]!='\n')
        {
           /* write uncompressed data removing last NULL byte*/
@@ -158,9 +159,10 @@
           printf("removed last NULL byte\n");
           #endif
        }
+       /* if the last byte of data is a \n, this file don't have a NULL byte end*/
        else
        {
-          /* write uncompressed data*/
+          /* write all the uncompressed data*/
           fwrite(data, 1, decompressed_size, outfile);
           #if DEBUG
           printf("NULL byte not present at the end of the data\n");
