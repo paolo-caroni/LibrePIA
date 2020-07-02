@@ -1172,7 +1172,7 @@
  /* function for change color*/
  int change_color(int integer_color_value,int position)
  {
-    /* invalid position */
+    /* invalid position*/
     if(position<=0 || position>total_style_number)
     {
        fprintf(stderr,"Invalid plot style number! Please enter position between 1 to %d.\n", total_style_number);
@@ -1185,7 +1185,7 @@
        /* mode_color exist*/
        if(mode_color[k]!='\0')
        {
-          /* original output can differ to this, but isn't a problem see ctb and stb specifrication*/
+          /* original output can differ to this, but isn't a problem see ctb and stb specification*/
           color[k]=integer_color_value;
           mode_color[k]=integer_color_value;
        }
