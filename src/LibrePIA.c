@@ -154,11 +154,17 @@
        {
           /* write uncompressed data removing last NULL byte*/
           fwrite(data, 1, decompressed_size-1, outfile);
+          #if DEBUG
+          printf("removed last NULL byte\n");
+          #endif
        }
        else
        {
           /* write uncompressed data*/
           fwrite(data, 1, decompressed_size, outfile);
+          #if DEBUG
+          printf("NULL byte not present at the end of the data\n");
+          #endif
        }
 
        /* debug*/
