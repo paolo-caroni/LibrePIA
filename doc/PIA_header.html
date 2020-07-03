@@ -22,6 +22,8 @@ this 60 bytes are uncompressed, and are divided in:<br>
 4 bytes with a splitted unsigned int32, that indicate the value of Deflated Size<br>
 <br>
 The sequential bytes are the compressed stream (zlib deflate) with windowBits=15 (the default) and (probably) level=Z_BEST_COMPRESSION.<br>
-Is very important that the uncompressed stream of data that will be compressed have a NULL byte terminator, if not the file will have a "syntax error" and would be not readed by much programs.<br>
+In many cases it's very important that the uncompressed stream of data that will be compressed have a NULL byte terminator, if not the file will have a "syntax error" and would be not readed by programs.<br>
+At the moment it's not clear when and why this NULL byte terminator it's needed, but I have noticed that if it's added and not needed the output file can be read, so in my honest opinion would be better add it as default option.<br>
+However testing is under evolution and I hope to understend the NULL byte mechanism.<br>
 </body>
 </html>

@@ -155,6 +155,8 @@
        {
           /* write uncompressed data removing last NULL byte*/
           fwrite(data, 1, decompressed_size-1, outfile);
+          /* NULL byte end it's needed*/
+          PIA_NULL_byte_needed=84;
           #if DEBUG
           printf("removed last NULL byte\n");
           #endif
@@ -164,6 +166,8 @@
        {
           /* write all the uncompressed data*/
           fwrite(data, 1, decompressed_size, outfile);
+          /* NULL byte end it's not needed*/
+          PIA_NULL_byte_needed=70;
           #if DEBUG
           printf("NULL byte not present at the end of the data\n");
           #endif
@@ -732,8 +736,30 @@
        defstream.opaque = Z_NULL;
 
        /* setup "buffer" as the compressed output and "data" as the decompressed input*/
-       /* size of input plus terminator*/
-       defstream.avail_in = (uInt)input_file_size+1;
+       /* if NULL byte end it's needed, need more investigations*/
+       if(PIA_NULL_byte_needed==84)
+       {
+          /* size of input plus terminator*/
+          defstream.avail_in = (uInt)input_file_size+1;
+          #if DEBUG
+          printf("compress PIA file: NULL byte present at the end of the data\n");
+          #endif
+       }
+       /* if NULL byte end it's not needed, need more investigations*/
+       else if(PIA_NULL_byte_needed==70)
+       {
+          /* size of input*/
+          defstream.avail_in = (uInt)input_file_size;
+          #if DEBUG
+          printf("compress PIA file: NULL byte not present at the end of the data\n");
+          #endif
+       }
+       /* at the moment it's not clear when and why NULL byte end it's needed, but if added and not needed the file can be opened, so it will be the default option*/
+       else
+       {
+          /* size of input plus terminator*/
+          defstream.avail_in = (uInt)input_file_size+1;
+       }
        /* input char array*/
        defstream.next_in = (Bytef *)data;
        /* size of output*/
@@ -741,8 +767,7 @@
        /* output char array*/
        defstream.next_out = (Bytef *)buffer;
 
-       /* the real compression work, this seems to be different from original deflate compression, need more investigations*/
-       /*deflateInit(&defstream, Z_BEST_COMPRESSION);*/
+       /* the real compression work*/
        /*deflateInit2(&defstream, Z_BEST_COMPRESSION, Z_DEFLATED, 15, 8, Z_DEFAULT_STRATEGY);*/
        deflateInit(&defstream, Z_BEST_COMPRESSION);
        deflate(&defstream, Z_FINISH);
@@ -796,7 +821,18 @@
 
        /* debug*/
        #if DEBUG
-       printf("readed %d decompressed bytes, expected %d bytes\n", decompressed_size, input_file_size+1);
+       if(PIA_NULL_byte_needed==84)
+       {
+          printf("readed %d decompressed bytes, expected %d bytes\n", decompressed_size, input_file_size+1);
+       }
+       else if(PIA_NULL_byte_needed==70)
+       {
+          printf("readed %d decompressed bytes, expected %d bytes\n", decompressed_size, input_file_size);
+       }
+       else
+       {
+          printf("readed %d decompressed bytes, expected %d bytes\n", decompressed_size, input_file_size+1);
+       }
        printf("writed %d compressed bytes\n", compressed_size);
        #endif
     }
@@ -815,6 +851,8 @@
     header[21]='B';
     /* set total_style_number to 255 (in CTB are always 255)*/
     total_style_number=255;
+    /* NULL byte end for default it's not needed*/
+    PIA_NULL_byte_needed=70;
     /* first line, description, can contain space*/
     sprintf( file_description, "");
     /* second line, aci_table_available, always TRUE for ctb*/
@@ -902,6 +940,8 @@
     header[21]='B';
     /* declare number of plot styles*/
     total_style_number=2;
+    /* NULL byte end for default it's not needed*/
+    PIA_NULL_byte_needed=70;
     /* first line, description, can contain space*/
     sprintf( file_description, "");
     /* second line, aci_table_available, always FALSE for stb*/

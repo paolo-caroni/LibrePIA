@@ -28,6 +28,8 @@ unsigned int input_file_size;
 /* other info*/
 /* number of line on uncompressed txt file*/
 int PIA_uncompressed_line_number;
+/* NULL byte end it's needed or not*/
+int PIA_NULL_byte_needed;
 
 /* buffer and utility*/
 int k;
