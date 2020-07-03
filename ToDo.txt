@@ -14,13 +14,15 @@ Done:
 -ACI list;
 -function for split and unsplit color;
 -function for change color;
--export to csv and tsv;
+-export plot style to csv and tsv;
 
 
 
 ToDo (difficulty is from my point of view):
 -add basic program for modify plot_style data with program and not with editor (medium);
 -add doxygen or other documentation (difficult);
+-add pmp basic parser (easy/medium) and improve it (difficult);
+-export pmp to not existent ppd (easy) or existent ppd (difficult);
 -correct bug on stb with more plot_style number... study malloc (it's really important?)(very difficult);
 -understand NULL byte mechanism on writing PIA (very difficult);
 -add a gtk program for modify plot_style (maybe can be a different project, very difficult/near to impossible).
