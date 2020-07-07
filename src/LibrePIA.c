@@ -25,6 +25,7 @@
 #include "LibrePIA.h"
 #include "plot_style_table.h"
 #include "ACI.h"
+#include "plotter.h"
 
 
  /* obtain information of version,file subclass type and sizes*/
@@ -550,7 +551,7 @@
     }
     else
     {
-       fprintf(stderr, "end of custom_lineweight_table ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+       fprintf(stderr, "end of custom_lineweight_table ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
     }
     /* close input file*/
     fclose(infile);
@@ -1595,4 +1596,366 @@
 
     /* close output file*/
     fclose(exported);
+ }
+
+
+ /* funtion for read PMP uncompressed text form file*/
+ int plot_model_parameter_parser(char *infilename)
+ {
+    /* open decompressed PIA file, this is very stupid, there is the data string,
+    but I don't know how analyze it... needs more C abilities*/
+    FILE *infile = fopen(infilename, "rb");
+
+    /* parse pmp file*/
+    /* meta values*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='m' && line_buffer[1]=='e' && line_buffer[2]=='t' && line_buffer[3]=='a' && line_buffer[4]=='{')
+    {
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: first line error, expected: meta{\n obtained: %s\n", line_buffer);
+    }
+    /* user_defined_model_pathname*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," user_defined_model_pathname=\"%[^\n]",&user_defined_model_pathname);
+    /* user_defined_model_basename*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," user_defined_model_basename=\"%[^\n]",&user_defined_model_basename);
+    /* driver_pathname*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," driver_pathname=\"%[^\n]",&driver_pathname);
+    /* driver_version*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," driver_version=\"%[^\n]",&driver_version);
+    /* driver_tag_line*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," driver_tag_line=\"%[^\n]",&driver_tag_line);
+    /* toolkit_version*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," toolkit_version=%d",&toolkit_version);
+    /* driver_type*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," driver_type=%d",&driver_type);
+    /* canonical_family_name*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," canonical_family_name=\"%[^\n]",&canonical_family_name);
+    /* show_custom_first TRUE or FALSE*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," show_custom_first=%c",&show_custom_first);
+    /* truetype_as_text TRUE or FALSE*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," truetype_as_text=%c",&truetype_as_text);
+    /* canonical_model_name*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," canonical_model_name=\"%[^\n]",&canonical_model_name);
+    /* localized_family_name*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," localized_family_name=\"%[^\n]",&localized_family_name);
+    /* localized_model_name*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," localized_model_name=\"%[^\n]",&localized_model_name);
+    /* file_only TRUE or FALSE*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," file_only=%c",&file_only);
+    /* model_abilities*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," model_abilities=\"%[^\n]",&model_abilities);
+    /* udm_description*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," udm_description=\"%[^\n]",&udm_description);
+    /* oprional win_ or short_net_name*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='w')
+    {
+       /* win_device_name*/
+       sscanf(line_buffer," win_device_name=\"%[^\n]",&win_device_name);
+       /* win_driver_name*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer," win_driver_name=\"%[^\n]",&win_driver_name);
+       /* fgets for short_net_name*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+    }
+    /* short_net_name*/
+    sscanf(line_buffer," short_net_name=\"%[^\n]",&short_net_name);
+    /* friendly_net_name*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," friendly_net_name=\"%[^\n]",&friendly_net_name);
+    /* dm_driver_version*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," dm_driver_version=%d",&dm_driver_version);
+    /* default_system_cfg TRUE or FALSE*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," default_system_cfg=%c",&default_system_cfg);
+    /* platform*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," platform=\"%[^\n]",&platform);
+    /* locale*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    sscanf(line_buffer," locale=\"%[^\n]",&locale);
+    /* read the end of meta{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of meta ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
+       fprintf(stderr, "This file probably is a PC3 and not a PMP");
+    }
+
+    /* mod values*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='m' && line_buffer[1]=='o' && line_buffer[2]=='d' && line_buffer[3]=='{')
+    {
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: mod values error, expected: mod{\n obtained: %s\n", line_buffer);
+    }
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='m' && line_buffer[2]=='e' && line_buffer[3]=='d' && line_buffer[4]=='i' && line_buffer[5]=='a' && line_buffer[6]=='{')
+    {
+       /* abilities*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer,"  abilities=\"%[^\n]",&abilities);
+       /* caps_state*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer,"  caps_state=\"%[^\n]",&caps_state);
+       /* ui_owner*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer,"  ui_owner=\"%[^\n]",&ui_owner);
+       /* size_max_x*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer,"  size_max_x=%4.1f",&size_max_x);
+       /* size_max_y*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer,"  size_max_y=%4.1f",&size_max_y);
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: mod values error, expected: media{\n obtained: %s\n", line_buffer);
+    }
+    /* read the end of media{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of media in mod ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+    }
+    /* read the end of mod{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of mod ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
+    }
+
+
+    /* del values*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='d' && line_buffer[1]=='e' && line_buffer[2]=='l' && line_buffer[3]=='{')
+    {
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: del values error, expected: del{\n obtained: %s\n", line_buffer);
+    }
+    /* media*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='m' && line_buffer[2]=='e' && line_buffer[3]=='d' && line_buffer[4]=='i' && line_buffer[5]=='a' && line_buffer[6]=='{')
+    {
+       /* verify abilities*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       if(line_buffer[13]==abilities[0] && line_buffer[14]==abilities[1] && line_buffer[15]==abilities[2] && line_buffer[16]==abilities[3])
+       {
+       }
+       else
+       {
+          fprintf(stderr,"WARNING: abilities error, expected: %s\n obtained: %s\n", abilities, line_buffer);
+       }
+       /* caps_state*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* ui_owner*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* size_max_x*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* size_max_y*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* read the end of media{*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: del values error, expected: media{\n obtained: %s\n", line_buffer);
+    }
+    /* end of media{*/
+    if(line_buffer[1]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of media in del ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+    }
+    /* read the end of del{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of del ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
+    }
+
+    /* udm values*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='u' && line_buffer[1]=='d' && line_buffer[2]=='m' && line_buffer[3]=='{')
+    {
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: udm values error, expected: del{\n obtained: %s\n", line_buffer);
+    }
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='c' && line_buffer[2]=='a' && line_buffer[3]=='l' && line_buffer[4]=='i' && line_buffer[5]=='b' && line_buffer[6]=='r')
+    {
+       /* calibration_x*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer,"  _x=%f",&calibration_x);
+       /* calibration_y*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       sscanf(line_buffer,"  _y=%f",&calibration_y);
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: udm values error, expected: calibration{\n obtained: %s\n", line_buffer);
+    }
+    /* read the end of calibration{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of calibration in udm ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+    }
+    /* media*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='m' && line_buffer[2]=='e' && line_buffer[3]=='d' && line_buffer[4]=='i' && line_buffer[5]=='a' && line_buffer[6]=='{')
+    {
+       /* verify abilities*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       if(line_buffer[13]==abilities[0] && line_buffer[14]==abilities[1] && line_buffer[15]==abilities[2] && line_buffer[16]==abilities[3])
+       {
+       }
+       else
+       {
+          fprintf(stderr,"WARNING: abilities error, expected: %s\n obtained: %s\n", abilities, line_buffer);
+       }
+       /* caps_state*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* ui_owner*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* size_max_x*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* size_max_y*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* read the end of media{*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: udm values error, expected: media{\n obtained: %s\n", line_buffer);
+    }
+    /* read the end of media{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='}')
+    {
+    }
+    else if(line_buffer[2]=='s' && line_buffer[3]=='i' && line_buffer[4]=='z' && line_buffer[5]=='e' && line_buffer[6]=='{')
+    {
+       /* declare position*/
+       fpos_t *pos;
+       /* get actual position on file*/
+       fgetpos(infile, pos);
+       /* remove old value from total_size_number*/
+       total_size_number=0;
+       /* count size struct number*/
+       while(line_buffer[2]!='}')
+       {
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          if(line_buffer[3]=='}')
+          {
+             total_size_number++;
+          }
+       }
+       #if DEBUG
+       printf("total size number is %d\n",total_size_number);
+       #endif
+       /* declare numbers of size struct*/
+       pmp_size s[total_size_number];
+       /* move to the start of size{*/
+       fsetpos(infile, pos);
+       /* remove old value from k*/
+       k=0;
+       /* loop for read size struct*/
+       for(k=0;k<total_size_number;k++)
+       {
+          /* start of size number k*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          /* first value*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          sscanf(line_buffer,"    caps_type=%d",&s[k].caps_type);
+          /* second value*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          sscanf(line_buffer,"    name=\"%[^\n]",&s[k].name);
+          /* third value*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          sscanf(line_buffer,"    localized_name=\"%[^\n]",&s[k].localized_name);
+          /* fourth value*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          sscanf(line_buffer,"    media_description_name=\"%[^\n]",&s[k].media_description_name);
+          /* fifth value*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          sscanf(line_buffer,"    media_group=%d",&s[k].media_group);
+          /* sixth value*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          sscanf(line_buffer,"    landscape_mode=%d",&s[k].landscape_mode);
+          /* end of size number k*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          if(line_buffer[3]!='}')
+          {
+             fprintf(stderr,"uncorrect end of size number %d",k);
+          }
+       }
+    }
+    else
+    {
+       fprintf(stderr, "End of media in udm ERROR, expected \"}\" or size{\nobtained \"%s\"\n", line_buffer);
+    }
+       /* read the end of size{*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       if(line_buffer[2]!='}')
+       {
+          fprintf(stderr, "End of size{ in udm ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[2]);
+       }
+       /* description{*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       printf("%s\n",line_buffer);
+
+
+
+
+
+
+
+
+
+
+    /* close input file*/
+    fclose(infile);
  }
