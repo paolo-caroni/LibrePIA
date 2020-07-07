@@ -1872,7 +1872,6 @@
        fprintf(stderr,"WARNING: udm values error, expected: media{\n obtained: %s\n", line_buffer);
     }
     /* read the end of media{*/
-    fgets(line_buffer,sizeof(line_buffer),infile);
     if(line_buffer[1]=='}')
     {
     }
