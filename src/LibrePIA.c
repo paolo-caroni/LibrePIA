@@ -1755,7 +1755,6 @@
        fprintf(stderr, "End of mod ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
     }
 
-
     /* del values*/
     fgets(line_buffer,sizeof(line_buffer),infile);
     if(line_buffer[0]=='d' && line_buffer[1]=='e' && line_buffer[2]=='l' && line_buffer[3]=='{')
@@ -1818,7 +1817,7 @@
     }
     else
     {
-       fprintf(stderr,"WARNING: udm values error, expected: del{\n obtained: %s\n", line_buffer);
+       fprintf(stderr,"WARNING: udm values error, expected: udm{\n obtained: %s\n", line_buffer);
     }
     fgets(line_buffer,sizeof(line_buffer),infile);
     if(line_buffer[1]=='c' && line_buffer[2]=='a' && line_buffer[3]=='l' && line_buffer[4]=='i' && line_buffer[5]=='b' && line_buffer[6]=='r')
@@ -1877,10 +1876,10 @@
     }
     else if(line_buffer[2]=='s' && line_buffer[3]=='i' && line_buffer[4]=='z' && line_buffer[5]=='e' && line_buffer[6]=='{')
     {
-       /* declare position*/
-       fpos_t *pos;
+       /* define file position*/
+       fpos_t *file_position = malloc(sizeof(fpos_t));
        /* get actual position on file*/
-       fgetpos(infile, pos);
+       fgetpos(infile, file_position);
        /* remove old value from total_size_number*/
        total_size_number=0;
        /* count size struct number*/
@@ -1896,9 +1895,10 @@
        printf("total size number is %d\n",total_size_number);
        #endif
        /* declare numbers of size struct*/
+       //extern pmp_size s[total_size_number];
        pmp_size s[total_size_number];
        /* move to the start of size{*/
-       fsetpos(infile, pos);
+       fsetpos(infile, file_position);
        /* remove old value from k*/
        k=0;
        /* loop for read size struct*/
@@ -1931,11 +1931,6 @@
              fprintf(stderr,"uncorrect end of size number %d",k);
           }
        }
-    }
-    else
-    {
-       fprintf(stderr, "End of media in udm ERROR, expected \"}\" or size{\nobtained \"%s\"\n", line_buffer);
-    }
        /* read the end of size{*/
        fgets(line_buffer,sizeof(line_buffer),infile);
        if(line_buffer[2]!='}')
@@ -1944,16 +1939,160 @@
        }
        /* description{*/
        fgets(line_buffer,sizeof(line_buffer),infile);
-       printf("%s\n",line_buffer);
+       if(line_buffer[2]=='d' && line_buffer[3]=='e' && line_buffer[4]=='s' && line_buffer[5]=='c' && line_buffer[6]=='r' && line_buffer[7]=='i')
+       {
+          /* define file position*/
+          fpos_t *file_position = malloc(sizeof(fpos_t));
+          /* get actual position on file*/
+          fgetpos(infile, file_position);
+          /* remove old value from total_description_number*/
+          total_description_number=0;
+          /* count size struct number*/
+          while(line_buffer[2]!='}')
+          {
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             if(line_buffer[3]=='}')
+             {
+                total_description_number++;
+             }
+          }
+          #if DEBUG
+          printf("total description number is %d\n",total_description_number);
+          #endif
+          /* declare numbers of description struct*/
+          //extern pmp_description d[total_description_number];
+          pmp_description d[total_description_number];
+          /* move to the start of description{*/
+          fsetpos(infile, file_position);
+          /* remove old value from k*/
+          k=0;
+          /* loop for read size struct*/
+          for(k=0;k<total_description_number;k++)
+          {
+             /* start of description number k*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             /* first value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    caps_type=%d",&d[k].caps_type);
+             /* second value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    name=\"%[^\n]",&d[k].name);
+             /* third value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    media_bounds_urx=%f",&d[k].media_bounds_urx);
+             /* fourth value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    media_bounds_ury=%f",&d[k].media_bounds_ury);
+             /* fifth value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    printable_bounds_llx=%f",&d[k].printable_bounds_llx);
+             /* sixth value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    printable_bounds_lly=%f",&d[k].printable_bounds_lly);
+             /* seventh value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    printable_bounds_urx=%f",&d[k].printable_bounds_urx);
+             /* eigth value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    printable_bounds_ury=%f",&d[k].printable_bounds_ury);
+             /* nine value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    printable_area=%f",&d[k].printable_area);
+             /* ten value*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             sscanf(line_buffer,"    dimensional=%c",&d[k].dimensional);
+             /* end of description number k*/
+             fgets(line_buffer,sizeof(line_buffer),infile);
+             if(line_buffer[3]!='}')
+             {
+                fprintf(stderr,"uncorrect end of size number %d",k);
+             }
+          }
+          /* read the end of description{*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          if(line_buffer[2]!='}')
+          {
+             fprintf(stderr, "End of description{ in udm ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[2]);
+          }
+          /* read the end of media{*/
+          fgets(line_buffer,sizeof(line_buffer),infile);
+          if(line_buffer[1]!='}')
+          {
+             fprintf(stderr, "End of media{ in udm ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+          }
+       }
+       else
+       {
+          fprintf(stderr, "WARNING: udm values error, expected: description{\n obtained: %s\n", line_buffer);
+       }
 
+    }
+    else
+    {
+       fprintf(stderr, "End of media in udm ERROR, expected \"}\" or size{\nobtained \"%s\"\n", line_buffer);
+    }
 
+    /* read the end of media{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]!='}')
+    {
+       fprintf(stderr, "End of udm{ ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
+    }
 
-
-
-
-
-
-
+    /* hidden values*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='h' && line_buffer[1]=='i' && line_buffer[2]=='d' && line_buffer[3]=='d' && line_buffer[4]=='e' && line_buffer[5]=='n' && line_buffer[6]=='{')
+    {
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: del values error, expected: hidden{\n obtained: %s\n", line_buffer);
+    }
+    /* media*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[1]=='m' && line_buffer[2]=='e' && line_buffer[3]=='d' && line_buffer[4]=='i' && line_buffer[5]=='a' && line_buffer[6]=='{')
+    {
+       /* verify abilities*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       if(line_buffer[13]==abilities[0] && line_buffer[14]==abilities[1] && line_buffer[15]==abilities[2] && line_buffer[16]==abilities[3])
+       {
+       }
+       else
+       {
+          fprintf(stderr,"WARNING: abilities error, expected: %s\n obtained: %s\n", abilities, line_buffer);
+       }
+       /* caps_state*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* ui_owner*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* size_max_x*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* size_max_y*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+       /* read the end of media{*/
+       fgets(line_buffer,sizeof(line_buffer),infile);
+    }
+    else
+    {
+       fprintf(stderr,"WARNING: hidden values error, expected: media{\n obtained: %s\n", line_buffer);
+    }
+    /* end of media{*/
+    if(line_buffer[1]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of media in hidden ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[1]);
+    }
+    /* read the end of del{*/
+    fgets(line_buffer,sizeof(line_buffer),infile);
+    if(line_buffer[0]=='}')
+    {
+    }
+    else
+    {
+       fprintf(stderr, "End of hidden ERROR, expected \"}\" obtained \"%c\"\n", line_buffer[0]);
+    }
 
     /* close input file*/
     fclose(infile);
